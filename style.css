@@ -1,0 +1,94 @@
+@font-face {
+    font-family: 'Monoton';
+    src: url('assets/fonts/Monoton/Monoton-Regular.ttf');
+}
+
+@font-face {
+    font-family: 'Rubik Regular';
+    src: url('assets/fonts/Rubik/static/Rubik-Regular.ttf');
+}
+
+:root {
+    --color-creamy-white: #fff9ef;
+    --color-cloud-orange: #dd6b6f;
+    --color-title-blue: #0b6581;
+}
+
+html {
+    font-size: 16px;
+}
+
+body {
+    background-image: url('assets/images/clouds.png');
+    height: 100vh;
+    background-size: cover;
+    background-position: left;
+    margin: 0;
+    background-color: var(--color-creamy-white);
+}
+/* general */
+/* titles */
+h1 {
+    font-family: 'Monoton';
+    font-size: 6.25rem;
+    color: var(--color-cloud-orange);
+}
+/* sub titles */
+h2 {
+    font-family: 'Rubik Regular';
+    font-size: 2.5rem;
+    color: var(--color-title-blue)
+}
+/* button text */
+h3 {
+    font-family: 'Rubik Regular';
+    font-size: 1.563rem;
+    color: var(--color-creamy-white);
+}
+/* main content */
+.flex-column {
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    justify-content: space-between;
+    height: 70vh;
+    margin-left: 4rem;
+}
+
+.title, .subtitle, .button-text {
+    margin-block: 0;
+}
+
+.title {
+    margin-top: auto;
+}
+
+.subtitle {
+    margin-top: -1rem;
+    margin-bottom: auto;
+}
+
+.button-text {
+    -webkit-user-select: none; /* Safari */ 
+    -moz-user-select: none; /* Firefox */ 
+    -ms-user-select: none; /* IE10+/Edge */
+    user-select: none; /* Standard */
+}
+
+.button {
+    background: var(--color-title-blue);
+    width: fit-content;
+    padding: 1rem;
+    border-radius: 1rem;
+    position: relative;
+}
+
+.button:hover {
+    cursor: pointer;
+    filter: brightness(1.2);
+}
+
+.button:active {
+    /* opacity: 0.8; */
+    top: 2px;
+}
