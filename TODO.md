@@ -1,1 +1,2 @@
 - [] add a button in the middle of sliders to collapse and replace with small button on side to open again
+- [] color selector does not work on firefox
