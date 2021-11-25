@@ -12,6 +12,7 @@ class ToolManager {
             active: '#dd6b6f',
             inactive: '#dfe6e9'
         }
+        this.setTool(this.#_currentTool);
     }
     // this function will be used for onclick for each of the tool icons
     setTool(tool) {
