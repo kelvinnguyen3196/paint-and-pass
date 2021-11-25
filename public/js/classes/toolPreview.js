@@ -1,4 +1,4 @@
-class toolPreview {
+class ToolPreview {
     #_toolRadius;
     #_toolOpacity;
     #_previewLayer;

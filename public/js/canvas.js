@@ -9,12 +9,11 @@ let s = sketch => {
         // set up tool preview
         const currentRadius = document.getElementById('brush-size').value;
         const currentOpacity = document.getElementById('brush-opacity').value;
-        toolPreviewLayer = new toolPreview(currentRadius, currentOpacity, width, height, sketch);
+        toolPreviewLayer = new ToolPreview(currentRadius, currentOpacity, width, height, sketch);
     }
 
     sketch.draw = () => {
-        sketch.background('white');
-
+        sketch.background('lightblue');
         // tool preview should always be last line of code executed to be on top
         toolPreviewLayer.drawPreview(sketch.mouseX, sketch.mouseY, width, height, sketch);
     }
