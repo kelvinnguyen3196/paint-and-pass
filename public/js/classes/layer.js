@@ -5,10 +5,11 @@ class Layer {
         this.#_layer = sketch.createGraphics(w, h);
     }
 
-    paint(color, radius, mX, mY) {
+    paint(color, radius, mX, mY, width, sketch) {
+        console.log(typeof color);
         for(let x = mX - radius; x < mX + radius; x++) {
             for(let y = mY - radius; y < mY + radius; y++) {
-                if((dist(x, y, mX, mY) < radius) && x > 0 && x <= width) {
+                if((sketch.dist(x, y, mX, mY) < radius) && x > 0 && x <= width) {
                     this.#_layer.set(x, y, color);
                 }
             }

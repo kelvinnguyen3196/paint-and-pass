@@ -1,13 +1,15 @@
 class LayerManager {
     #_layers;
     #_activeLayers;
+    #_currentLayer;
 
     constructor() {
         this.#_layers = [];
         this.#_activeLayers = [];
+        this.#_currentLayer = 0;
     }
 
-    renderLayer(sketch) {
+    renderLayers(sketch) {
         for(let i = 0; i < this.#_layers.length; i++) {
             if(this.#_activeLayers[i] === true) {
                 sketch.image(this.#_layers[i].layer, 0, 0);
@@ -15,9 +17,9 @@ class LayerManager {
         }
     }
 
-    paintOnLayer(l, color, radius, mX, mY) {
-        if(this.#_activeLayers[l] === true) {
-            this.#_layers[l].paint(color, radius, mX, mY);
+    paintOnLayer(color, radius, mX, mY, width, sketch) {
+        if(this.#_activeLayers[this.#_currentLayer] === true) {
+            this.#_layers[this.#_currentLayer].paint(color, radius, mX, mY, width, sketch);
         }
     }
 
@@ -34,8 +36,13 @@ class LayerManager {
     toggleLayer(layer) { // set layer as active or inactive
         this.#_activeLayers[layer] = !this.#_activeLayers[layer];
     }
-
+    // #region setters and getters
     get numOfLayers() {
         return this.#_layers.length;
     }
+
+    set currentLayer(layer) {
+        this.#_currentLayer = layer;
+    }
+    // #endregion
 }
