@@ -6,7 +6,6 @@ class Layer {
     }
 
     paint(color, radius, mX, mY, width, sketch) {
-        console.log(typeof color);
         for(let x = mX - radius; x < mX + radius; x++) {
             for(let y = mY - radius; y < mY + radius; y++) {
                 if((sketch.dist(x, y, mX, mY) < radius) && x > 0 && x <= width) {

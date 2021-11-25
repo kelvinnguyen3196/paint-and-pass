@@ -4,4 +4,7 @@
 - [] when adding new layer, switch to current layer to that layer?
 
 # bugs
-- [] color selector does not work on firefox
+- [x] color selector does not work on firefox
+    - update: input color window shows up in a different window and i just 
+    didn't see it
+- [] change size on canvas on window resize?

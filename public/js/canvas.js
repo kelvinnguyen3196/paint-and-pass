@@ -33,9 +33,16 @@ let s = sketch => {
         if(!accessingTools) {
             const currentColor = document.getElementById('color-selector').value;
             const currentRadius = document.getElementById('brush-size').value;
-            // the algorithm behind sketch uses twice as large radisu so we need
+            const currentOpacity = document.getElementById('brush-opacity').value;
+            // convert color from hex to rgba to support alpha
+            const currentColorHex = sketch.color(currentColor);
+            const r = sketch.red(currentColorHex);
+            const g = sketch.green(currentColorHex);
+            const b = sketch.blue(currentColorHex);
+            const currentColorRGBA = sketch.color('rgba(' + r + ',' + g + ',' + b + ',' + currentOpacity + ')');
+            // the algorithm behind sketch uses twice as large radius so we need
             // to divide by two to get an accurate size
-            layerManager.paintOnLayer(sketch.color(currentColor), Number(currentRadius) / 2, sketch.mouseX, sketch.mouseY, width, sketch);
+            layerManager.paintOnLayer(currentColorRGBA, Number(currentRadius) / 2, sketch.mouseX, sketch.mouseY, width, sketch);
         }
     }
 
@@ -57,7 +64,6 @@ let s = sketch => {
     document.getElementById('brush-opacity').onmouseup = () => {
         accessingTools = false;
     }
-
     // #endregion
 }
 
