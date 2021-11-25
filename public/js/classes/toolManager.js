@@ -79,6 +79,10 @@ class ToolManager {
                 if(idSplit[0] === 'layer-trash') {
                     layerManager.clearLayer(Number(idSplit[1]) - 1, width, height, sketch, toolManager);
                 }
+
+                if(idSplit[0] === 'layer-eye') {
+                    layerManager.toggleLayer(Number(idSplit[1]) - 1);
+                }
             });
         });
     }
