@@ -33,7 +33,7 @@ let s = sketch => {
     }
 
     sketch.mouseDragged = () => {
-        if(!accessingTools) {
+        if(!accessingTools && toolManager.currentTool === 'brush-tool') {
             const currentColor = document.getElementById('color-selector').value;
             const currentRadius = document.getElementById('brush-size').value;
             const currentOpacity = document.getElementById('brush-opacity').value;
@@ -46,6 +46,12 @@ let s = sketch => {
             // the algorithm behind sketch uses twice as large radius so we need
             // to divide by two to get an accurate size
             layerManager.paintOnLayer(currentColorRGBA, Number(currentRadius) / 2, sketch.mouseX, sketch.mouseY, width, sketch);
+        }
+        if(!accessingTools && toolManager.currentTool === 'eraser-tool') {
+            const eraserColor = sketch.color(0, 0);
+            const currentRadius = document.getElementById('brush-size').value;
+
+            layerManager.paintOnLayer(eraserColor, Number(currentRadius) / 2, sketch.mouseX, sketch.mouseY, width, sketch);
         }
     }
 
@@ -82,4 +88,4 @@ let p5v1 = new p5(s, 'canvas-container');
 // prevent right click
 window.addEventListener('contextmenu', e => {
     e.preventDefault();
-}, false);
+});

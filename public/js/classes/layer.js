@@ -3,6 +3,10 @@ class Layer {
     
     constructor(w, h, sketch) {
         this.#_layer = sketch.createGraphics(w, h);
+        // .clear() makes all pixels transparent
+        // it seems like it is by default transparent, but just
+        // to be sure we will .clear() it
+        this.#_layer.clear();
     }
 
     paint(color, radius, mX, mY, width, sketch) {
