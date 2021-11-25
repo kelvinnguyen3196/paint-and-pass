@@ -133,3 +133,9 @@ input[type="range"]::-moz-range-track {
     background-color: var(--color-mid-cool-gray);
     border-radius: 5px;
 }
+
+#canvas-container {
+    height: calc(100vh - 3.125rem);
+    width: 100vw;
+    overflow: hidden;
+}
