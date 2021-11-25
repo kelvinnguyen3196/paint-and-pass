@@ -147,7 +147,7 @@ input[type="range"]::-moz-range-track {
 }
 /* layers window styling */
 .layers-window {
-    /* display: none; */
+    display: none;
     position: fixed;
     right: 1rem;
     top: 4.125rem;

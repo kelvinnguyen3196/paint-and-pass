@@ -4,8 +4,8 @@ class ToolManager {
     #_toolPaths;
     #_toolColors;
 
-    constructor(currentTool) {
-        this.#_currentTool = currentTool;
+    constructor() {
+        this.#_currentTool = 'brush-tool';
         this.#_tools = ['brush-tool', 'eraser-tool', 'layer-tool'];
         this.#_toolPaths = ['brush-path', 'eraser-path', 'layer-path'];
         this.#_toolColors = {
@@ -32,7 +32,7 @@ class ToolManager {
         }
         // if layers tool click open window else close
         if(tool === 'layer-tool') {
-            this.openLayersWindow;
+            this.openLayersWindow();
         }
         else {
             this.closeLayersWindow();

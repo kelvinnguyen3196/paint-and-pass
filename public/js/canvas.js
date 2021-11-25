@@ -4,6 +4,7 @@ let s = sketch => {
 
     let toolPreviewLayer;
     let layerManager;
+    let toolManager;
     // is artist currently accessing tools like the slider?
     let accessingTools;
 
@@ -18,6 +19,8 @@ let s = sketch => {
         layerManager = new LayerManager();
         // set up first layer - we never draw on background
         layerManager.addLayer(new Layer(width, height, sketch));
+        // set up tool manager
+        toolManager = new ToolManager();
     }
 
     sketch.draw = () => {
@@ -64,6 +67,13 @@ let s = sketch => {
     document.getElementById('brush-opacity').onmouseup = () => {
         accessingTools = false;
     }
+
+    const toolButtons = document.getElementsByClassName('tool');
+    toolButtons.forEach((tool) => {
+        tool.addEventListener('click', function() {
+            toolManager.setTool(this.id);
+        });
+    });
     // #endregion
 }
 
