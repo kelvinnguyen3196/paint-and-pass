@@ -6,12 +6,13 @@
 - It will contain a method for the actual painting and erasing (painting with alpha) of the canvas. 
 ### Variables
 ```js
+    layer // from createGraphics
 ```
 ### Functions
 ```js
-    paint(color, radius) {
-        for x = mouseX - radius to mouseX + radius
-            for y = mouseY - radius to mouseY + radius
+    paint(color, radius, mX, mY) {
+        for x = mX - radius to mX + radius
+            for y = mY - radius to mY + radius
                 if(...) // see example code from online
                     layer.set(x, y, color)
     }
@@ -24,6 +25,8 @@
 ### Variables
 ```js
     layers = []
+    // same size as layers will store true if layer is active
+    activeLayers = []
 ```
 ### Functions
 ```js
@@ -32,8 +35,8 @@
         for layer in layers
             image(layer, 0, 0)
     }
-    paintOnLayer(l, color, radius) {
-        layer[l].paint(color, radius)
+    paintOnLayer(l, color, radius, mouseX, mouseY) {
+        layer[l].paint(color, radius, mouseX, mouseY)
     }
     addLayer(layer) {
         layers.push(layer)
