@@ -48,3 +48,31 @@
         return layers.length;
     }
 ```
+
+## ToolManager
+### Purpose
+- To make change which tool is currently colored and keep track of the current 
+tool
+### Implementation Notes
+### Variables
+```js
+    currentTool
+    tools // all tool names
+```
+### Functions
+```js
+    // this function will be used in the callback function when clicking tool
+    setTool(tool) {
+        for t in tools
+            if t === tool
+                tool.style.fill = active color
+            else
+                tool.style.fill = inactive color
+
+        if tool === layers
+            openLayersWindow
+    }
+    openLayerWindow() {
+        set layers window display to active
+    }
+```

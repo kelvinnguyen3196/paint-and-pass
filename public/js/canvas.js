@@ -4,7 +4,7 @@ let s = sketch => {
 
     let toolPreviewLayer;
     let layerManager;
-
+    // is artist currently accessing tools like the slider?
     let accessingTools;
 
     sketch.setup = () => {
