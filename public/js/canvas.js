@@ -77,7 +77,7 @@ let s = sketch => {
     const toolButtons = document.getElementsByClassName('tool');
     toolButtons.forEach((tool) => {
         tool.addEventListener('click', function() {
-            toolManager.setTool(this.id);
+            toolManager.setTool(this.id, layerManager);
         });
     });
     // #endregion
