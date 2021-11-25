@@ -4,37 +4,30 @@ let s = sketch => {
 
     let toolPreviewLayer;
 
-    let toolRadius = document.getElementById('brush-size').value;
-
     sketch.setup = () => {
         sketch.createCanvas(width, height);
-
-        toolPreviewLayer = sketch.createGraphics(width, height);
-        toolPreviewLayer.clear();
+        // set up tool preview
+        const currentRadius = document.getElementById('brush-size').value;
+        const currentOpacity = document.getElementById('brush-opacity').value;
+        toolPreviewLayer = new toolPreview(currentRadius, currentOpacity, width, height, sketch);
     }
 
     sketch.draw = () => {
-        sketch.background('lightblue');
+        sketch.background('white');
 
-        toolPreviewLayer.clear();
-        toolPreviewLayer.noFill();
-        toolPreviewLayer.stroke(0);
-        toolPreviewLayer.ellipse(sketch.mouseX, sketch.mouseY, toolRadius, toolRadius);
         // tool preview should always be last line of code executed to be on top
-        sketch.image(toolPreviewLayer, 0, 0, width, height);
+        toolPreviewLayer.drawPreview(sketch.mouseX, sketch.mouseY, width, height, sketch);
     }
 
+    // #region event listeners
     document.getElementById('brush-size').oninput = () => {
-        toolRadius = document.getElementById('brush-size').value;
+        toolPreviewLayer.radius = document.getElementById('brush-size').value;
     }
+    
+    document.getElementById('brush-opacity').oninput = () => {
+        toolPreviewLayer.opacity = document.getElementById('brush-opacity').value;
+    }
+    // #endregion
 }
 
 let p5v1 = new p5(s, 'canvas-container');
-// function setup() {
-//     let c = createCanvas(400, 400);
-//     c.parent('canvas-container');
-// }
-
-// function draw() {
-//     background('blue');
-// }

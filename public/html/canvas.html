@@ -7,6 +7,7 @@
     <title>Paint and Pass</title>
     <link rel="stylesheet" href="../css/canvas.css">
     <script src="../../assets/libraries/p5.min.js"></script>
+    <script src="../js/classes/toolPreview.js"></script>
     <script src="../js/canvas.js" defer></script>
 </head>
 <body>
@@ -27,11 +28,11 @@
 
     <div class="sliders">
         <input type="range" min="0" max="100" step="5" value="25" class="slider" id="brush-size">
-        <input type="range" min="0" max="100" step="5" value="100" class="slider" id="brush-opacity">
+        <input type="range" min="0" max="1" step="0.05" value="100" class="slider" id="brush-opacity">
     </div>
 
     <div id="canvas-container">
-        
+
     </div>
 </body>
 </html>
