@@ -186,7 +186,11 @@ input[type="range"]::-moz-range-track {
     border-radius: 5px;
 }
 
-#layer-trash {
+.layer + .layer {
+    margin-top: 0.5rem;
+}
+
+[id^=layer-trash] {
     margin-left: auto;
 }
 /* hovers */

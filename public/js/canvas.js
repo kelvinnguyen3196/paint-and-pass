@@ -19,8 +19,10 @@ let s = sketch => {
         layerManager = new LayerManager();
         // set up first layer - we never draw on background
         layerManager.addLayer(new Layer(width, height, sketch));
+        layerManager.addLayer(new Layer(width, height, sketch));
+        layerManager.addLayer(new Layer(width, height, sketch));
         // set up tool manager
-        toolManager = new ToolManager();
+        toolManager = new ToolManager(layerManager, width, height, sketch);
     }
 
     sketch.draw = () => {
@@ -77,7 +79,7 @@ let s = sketch => {
     const toolButtons = document.getElementsByClassName('tool');
     toolButtons.forEach((tool) => {
         tool.addEventListener('click', function() {
-            toolManager.setTool(this.id, layerManager);
+            toolManager.setTool(this.id, layerManager, width, height, sketch);
         });
     });
     // #endregion
