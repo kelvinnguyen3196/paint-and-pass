@@ -22,6 +22,12 @@ html {
 body {
     margin: 0;
 }
+
+p {
+    font-family: 'Rubik Regular';
+    font-size: 1.3rem;
+    margin-block: 1rem;
+}
 /* top bar styling */
 .top-bar-container {
     height: 3.125rem;
@@ -138,4 +144,51 @@ input[type="range"]::-moz-range-track {
     height: calc(100vh - 3.125rem);
     width: 100vw;
     overflow: hidden;
+}
+/* layers window styling */
+.layers-window {
+    /* display: none; */
+    position: fixed;
+    right: 1rem;
+    top: 4.125rem;
+    width: 300px;
+    border-radius: 5px;
+    background-color: var(--color-title-blue);
+    padding-bottom: 1rem;
+}
+
+.layers-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-inline: 1.125rem;
+    color: var(--color-light-cool-gray)
+}
+
+.layers-tool {
+    height: 1.7rem;
+    width: 1.7rem;
+}
+
+.layers-title svg path {
+    fill: var(--color-light-cool-gray);
+}
+
+.layer {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    height: 50px;
+    margin-inline: 0.5rem;
+    padding-inline: 0.5rem;
+    background: var(--color-light-cool-gray);
+    border-radius: 5px;
+}
+
+#layer-trash {
+    margin-left: auto;
+}
+/* hovers */
+.tool:hover, .layers-tool:hover {
+    cursor: pointer;
 }
