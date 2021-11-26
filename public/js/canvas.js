@@ -27,8 +27,6 @@ let s = sketch => {
         layerManager = new LayerManager();
         // set up first layer - we never draw on background
         layerManager.addLayer(new Layer(width, height, sketch), width, height, sketch, toolManager);
-        layerManager.addLayer(new Layer(width, height, sketch), width, height, sketch, toolManager);
-        layerManager.addLayer(new Layer(width, height, sketch), width, height, sketch, toolManager);
     }
 
     sketch.draw = () => {
