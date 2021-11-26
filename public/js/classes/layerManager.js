@@ -51,6 +51,11 @@ class LayerManager {
 
             if(i === this.#_currentLayer && this.#_activeLayers[i]) {
                 document.getElementById(`layer_${i + 1}`).style.backgroundColor = '#dd6b6f';
+                document.getElementById(`layer_${i + 1}`).style.filter =  `brightness(1)`;
+            }
+            if(i === this.#_currentLayer && !this.#_activeLayers[i]) {
+                document.getElementById(`layer_${i + 1}`).style.backgroundColor = '#dd6b6f';
+                document.getElementById(`layer_${i + 1}`).style.filter =  `brightness(0.8)`;
             }
         }
     }
@@ -70,11 +75,12 @@ class LayerManager {
             layersHTML.push('</div>');
         }
         const html = layersHTML.join('');
-        console.log('num: ' + this.#_layers.length);
 
         document.getElementById('layers-window').innerHTML = html;
 
         toolManager.layerToolHandler(this, width, height, sketch, toolManager);
+
+        this.colorLayers();
     }
 
     getEyeIconHTML(id) {

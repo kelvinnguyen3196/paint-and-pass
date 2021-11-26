@@ -41,14 +41,14 @@ class ToolManager {
     }
 
     openLayersWindow(layerManager, width, height, sketch) {
+        // update the layers window
         const html = this.createHTMLLayersElement(layerManager);
-
         document.getElementById('layers-window').innerHTML = html;
-
+        // color the layers accordingly
         layerManager.colorLayers();
-
+        // set event handlers for layer buttons
         this.layerToolHandler(layerManager, width, height, sketch, this);
-
+        // activate layers window
         document.getElementById('layers-window').style.display = 'block';
     }
 
