@@ -35,8 +35,7 @@ class LayerManager {
 
     toggleLayer(layer) { // set layer as active or inactive
         this.#_activeLayers[layer] = !this.#_activeLayers[layer];
-        console.log(layer);
-
+        // color layers accordingly
         this.colorLayers();
     }
 
@@ -48,7 +47,7 @@ class LayerManager {
             else {
                 document.getElementById(`layer_${i + 1}`).style.backgroundColor = '#a0b3b9';
             }
-
+            // for active layers
             if(i === this.#_currentLayer && this.#_activeLayers[i]) {
                 document.getElementById(`layer_${i + 1}`).style.backgroundColor = '#dd6b6f';
                 document.getElementById(`layer_${i + 1}`).style.filter =  `brightness(1)`;
@@ -70,7 +69,7 @@ class LayerManager {
         for (let i = this.#_layers.length; i > 0; i--) {
             layersHTML.push(`<div id="layer_${i}" class="layer">`);
             layersHTML.push(this.getEyeIconHTML(i));
-            layersHTML.push(`<p>Layer ${i}</p>`);
+            layersHTML.push(`<p id="layer-name_${i}" class="layer-name">Layer ${i}</p>`);
             layersHTML.push(this.getTrashIconHTML(i));
             layersHTML.push('</div>');
         }
@@ -80,6 +79,11 @@ class LayerManager {
 
         toolManager.layerToolHandler(this, width, height, sketch, toolManager);
 
+        this.colorLayers();
+    }
+
+    setLayerActive(layer) {
+        this.currentLayer = layer;
         this.colorLayers();
     }
 

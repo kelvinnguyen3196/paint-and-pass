@@ -59,7 +59,7 @@ class ToolManager {
         for (let i = layerManager.numOfLayers; i > 0; i--) {
             layersHTML.push(`<div id="layer_${i}" class="layer">`);
             layersHTML.push(this.getEyeIconHTML(i));
-            layersHTML.push(`<p>Layer ${i}</p>`);
+            layersHTML.push(`<p id="layer-name_${i}" class="layer-name">Layer ${i}</p>`);
             layersHTML.push(this.getTrashIconHTML(i));
             layersHTML.push('</div>');
         }
@@ -85,6 +85,14 @@ class ToolManager {
                 if(idSplit[0] === 'layer-eye') {
                     layerManager.toggleLayer(Number(idSplit[1]) - 1);
                 }
+            });
+        });
+
+        const layerSections = document.getElementsByClassName('layer-name');
+        layerSections.forEach((section) => {
+            section.addEventListener('click', function() {
+                const idSplit = this.id.split('_');
+                layerManager.setLayerActive(Number(idSplit[1]) - 1);
             });
         });
     }
