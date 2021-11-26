@@ -79,7 +79,7 @@ class ToolManager {
                 const idSplit = this.id.split('_');
 
                 if(idSplit[0] === 'layer-trash') {
-                    layerManager.clearLayer(Number(idSplit[1]) - 1, width, height, sketch, toolManager);
+                    layerManager.deleteLayer(Number(idSplit[1]) - 1, width, height, sketch, toolManager);
                 }
 
                 if(idSplit[0] === 'layer-eye') {

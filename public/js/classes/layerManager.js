@@ -59,7 +59,7 @@ class LayerManager {
         }
     }
 
-    clearLayer(layer, width, height, sketch, toolManager) {
+    deleteLayer(layer, width, height, sketch, toolManager) {
         this.#_layers.splice(layer, 1);
         this.#_activeLayers.splice(layer, 1);
 
@@ -78,6 +78,26 @@ class LayerManager {
         document.getElementById('layers-window').innerHTML = html;
 
         toolManager.layerToolHandler(this, width, height, sketch, toolManager);
+
+        // deleting last layer
+        if(layer === 0) {
+            // no layers left
+            if(this.#_layers.length === 0) {
+                this.#_currentLayer = null;
+            }
+            // there are layers
+            else {
+                // we deleted current layer
+                if(layer === this.#_currentLayer) {
+                    this.#_currentLayer = 0;
+                }
+                else {
+                    this.#_currentLayer -= 1;
+                }
+            }
+        }
+        
+        console.log(this.#_currentLayer);
 
         this.colorLayers();
     }
