@@ -1,4 +1,10 @@
 let s = sketch => {
+    // key codes
+    let qKey = 81;
+    let wKey = 87;
+    let eKey = 69;
+    let rKey = 82;
+
     let height = document.getElementById('canvas-container').offsetHeight;
     let width = document.getElementById('canvas-container').offsetWidth;
 
@@ -82,6 +88,19 @@ let s = sketch => {
             toolManager.setTool(this.id, layerManager, width, height, sketch);
         });
     });
+    // #endregion
+    // #region buttons
+    sketch.keyPressed = () => {
+        if(sketch.keyCode === qKey) {
+            toolManager.setTool('brush-tool', layerManager, width, height, sketch);
+        }
+        else if(sketch.keyCode === wKey) {
+            toolManager.setTool('eraser-tool', layerManager, width, height, sketch);
+        }
+        else if(sketch.keyCode === eKey) {
+            toolManager.setTool('layer-tool', layerManager, width, height, sketch);
+        }
+    }
     // #endregion
 }
 

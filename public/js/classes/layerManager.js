@@ -48,6 +48,10 @@ class LayerManager {
             else {
                 document.getElementById(`layer_${i + 1}`).style.backgroundColor = '#a0b3b9';
             }
+
+            if(i === this.#_currentLayer && this.#_activeLayers[i]) {
+                document.getElementById(`layer_${i + 1}`).style.backgroundColor = '#dd6b6f';
+            }
         }
     }
 
