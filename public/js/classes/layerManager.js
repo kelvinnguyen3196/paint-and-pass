@@ -35,23 +35,38 @@ class LayerManager {
 
     toggleLayer(layer) { // set layer as active or inactive
         this.#_activeLayers[layer] = !this.#_activeLayers[layer];
+        console.log(layer);
+
+        this.colorLayers();
+    }
+
+    colorLayers() {
+        for(let i = 0; i < this.#_activeLayers.length; i++) {
+            if(this.#_activeLayers[i]) {
+                document.getElementById(`layer_${i + 1}`).style.backgroundColor = '#dfe6e9';
+            }
+            else {
+                document.getElementById(`layer_${i + 1}`).style.backgroundColor = '#a0b3b9';
+            }
+        }
     }
 
     clearLayer(layer, width, height, sketch, toolManager) {
-        // create a new layer and splice to replace
         this.#_layers.splice(layer, 1);
+        this.#_activeLayers.splice(layer, 1);
 
         let layersHTML = [];
         layersHTML.push(this.getLayersTitleHTML());
         // for(let i = 0; i < layerManager.numOfLayers; i++) {
         for (let i = this.#_layers.length; i > 0; i--) {
-            layersHTML.push(`<div id="${i}" class="layer">`);
+            layersHTML.push(`<div id="layer_${i}" class="layer">`);
             layersHTML.push(this.getEyeIconHTML(i));
             layersHTML.push(`<p>Layer ${i}</p>`);
             layersHTML.push(this.getTrashIconHTML(i));
             layersHTML.push('</div>');
         }
         const html = layersHTML.join('');
+        console.log('num: ' + this.#_layers.length);
 
         document.getElementById('layers-window').innerHTML = html;
 

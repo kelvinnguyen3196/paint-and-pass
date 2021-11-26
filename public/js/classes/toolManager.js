@@ -45,6 +45,8 @@ class ToolManager {
 
         document.getElementById('layers-window').innerHTML = html;
 
+        layerManager.colorLayers();
+
         this.layerToolHandler(layerManager, width, height, sketch, this);
 
         document.getElementById('layers-window').style.display = 'block';
@@ -55,7 +57,7 @@ class ToolManager {
         layersHTML.push(this.getLayersTitleHTML());
         // for(let i = 0; i < layerManager.numOfLayers; i++) {
         for (let i = layerManager.numOfLayers; i > 0; i--) {
-            layersHTML.push(`<div id="${i}" class="layer">`);
+            layersHTML.push(`<div id="layer_${i}" class="layer">`);
             layersHTML.push(this.getEyeIconHTML(i));
             layersHTML.push(`<p>Layer ${i}</p>`);
             layersHTML.push(this.getTrashIconHTML(i));
