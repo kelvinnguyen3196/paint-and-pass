@@ -23,14 +23,17 @@ class LayerManager {
         }
     }
 
-    addLayer(layer) {
+    addLayer(layer, width, height, sketch, toolManager) {
         this.#_activeLayers.push(true);
         this.#_layers.push(layer);
-    }
 
-    removeLayer(i) {
-        this.#_activeLayers.splice(i, 1);
-        this.#_layers.splice(i, 1);
+        this.#_currentLayer = this.#_layers.length - 1;
+
+        const html = toolManager.createHTMLLayersElement(this);
+        document.getElementById('layers-window').innerHTML = html;
+
+        toolManager.layerToolHandler(this, width, height, sketch, toolManager);
+        this.colorLayers();
     }
 
     toggleLayer(layer) { // set layer as active or inactive
@@ -96,6 +99,11 @@ class LayerManager {
                 }
             }
         }
+        else {
+            if(this.#_currentLayer !== 0) {
+                this.#_currentLayer -= 1;
+            }
+        }
         
         console.log(this.#_currentLayer);
 
@@ -125,7 +133,7 @@ class LayerManager {
     getLayersTitleHTML() {
         const html = '<div class="layers-title">' +
             '<p>Layers</p>' +
-            '<svg class="layers-tool" viewBox="0 0 512 512">' +
+            '<svg id="add-layer-button" class="layers-tool" viewBox="0 0 512 512">' +
             '<path fill-rule="evenodd" clip-rule="evenodd" d="M272 48C272 39.1634 264.837 32 256 32C247.163 32 240 39.1634 240 48V240H48C39.1634 240 32 247.163 32 256C32 264.837 39.1634 272 48 272H240V464C240 472.837 247.163 480 256 480C264.837 480 272 472.837 272 464V272H464C472.837 272 480 264.837 480 256C480 247.163 472.837 240 464 240H272V48Z" fill="black"/>' +
             '</svg>' +
             '</div>';

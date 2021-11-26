@@ -21,14 +21,14 @@ let s = sketch => {
         const currentRadius = document.getElementById('brush-size').value;
         const currentOpacity = document.getElementById('brush-opacity').value;
         toolPreviewLayer = new ToolPreview(currentRadius, currentOpacity, width, height, sketch);
+        // set up tool manager
+        toolManager = new ToolManager(layerManager, width, height, sketch);
         // set up layer manager
         layerManager = new LayerManager();
         // set up first layer - we never draw on background
-        layerManager.addLayer(new Layer(width, height, sketch));
-        layerManager.addLayer(new Layer(width, height, sketch));
-        layerManager.addLayer(new Layer(width, height, sketch));
-        // set up tool manager
-        toolManager = new ToolManager(layerManager, width, height, sketch);
+        layerManager.addLayer(new Layer(width, height, sketch), width, height, sketch, toolManager);
+        layerManager.addLayer(new Layer(width, height, sketch), width, height, sketch, toolManager);
+        layerManager.addLayer(new Layer(width, height, sketch), width, height, sketch, toolManager);
     }
 
     sketch.draw = () => {
