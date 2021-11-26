@@ -32,7 +32,7 @@ let s = sketch => {
     }
 
     sketch.draw = () => {
-        sketch.background('lightblue');
+        sketch.background('#ffffff');
 
         // render all layers
         layerManager.renderLayers(sketch);
