@@ -241,6 +241,11 @@ input[type="range"]::-moz-range-track {
     flex-direction: column;
 }
 
+.modal-room-id {
+    display: flex;
+    gap: 1ch;
+}
+
 h1, h2 {
     margin-block: 0;
 }
@@ -331,7 +336,7 @@ h3 {
     margin-bottom: 1rem;
 }
 
-.waiting-modal-box {
+.waiting-modal-box h1, .waiting-modal-box h2:not(#room-id) {
     -webkit-user-select: none;  /* Safari */ 
     -moz-user-select: none;     /* Firefox */ 
     -ms-user-select: none;      /* IE10+/Edge */

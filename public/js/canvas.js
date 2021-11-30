@@ -1,5 +1,13 @@
 // waiting modal scripting
+const urlSearchParams = new URLSearchParams(window.location.search);
+const params = Object.fromEntries(urlSearchParams.entries());
+console.log(params);
 
+const userName = params.name;
+const roomId = params.room;
+
+document.getElementById('modal-playerName').innerHTML = userName;
+document.getElementById('room-id').innerHTML = roomId;
 
 let s = sketch => {
     // key codes
