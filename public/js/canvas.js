@@ -87,6 +87,7 @@ let s = sketch => {
         // #endregion
         // #region 'main-socket' we know we are the main socket
         socket.on('main-socket', () => {
+            console.log('main scoket called');
             mainSocket = true;
         });
         // #endregion
@@ -132,6 +133,7 @@ let s = sketch => {
                 bothReady = true;
                 document.getElementById('waiting-modal-wrapper').style.display = 'none';
                 socket.emit('both-ready');
+                console.log('kelvin?');
             }
         });
         // #endregion

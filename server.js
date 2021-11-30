@@ -84,14 +84,16 @@ io.on('connection', socket => {
                 connections[room][0] = newSocket;
                 // socket.emit('main-socket');
                 // socket.emit('player-num', 0);
-                io.to(connections[room][0]['socket_id']).emit('player-num', 0);
                 io.to(connections[room][0]['socket_id']).emit('main-socket');
+                io.to(connections[room][0]['socket_id']).emit('player-num', 0);
                 console.log('2: ' + socket.id);
             }
             else {  // second player slot is empty
                 connections[room][2] = newSocket;
-                socket.emit('main-socket');
-                socket.emit('player-num', 1);
+                // socket.emit('main-socket');
+                // socket.emit('player-num', 1);
+                io.to(connections[room][2]['socket_id']).emit('main-socket');
+                io.to(connections[room][2]['socket_id']).emit('player-num', 1);
                 console.log('3: ' + socket.id);
             }
         }
