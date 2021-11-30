@@ -1,11 +1,11 @@
 @font-face {
     font-family: 'Monoton';
-    src: url('../../assets/fonts/Monoton/Monoton-Regular.ttf');
+    src: url('../assets/fonts/Monoton/Monoton-Regular.ttf');
 }
 
 @font-face {
     font-family: 'Rubik Regular';
-    src: url('../../assets/fonts/Rubik/static/Rubik-Regular.ttf');
+    src: url('../assets/fonts/Rubik/static/Rubik-Regular.ttf');
 }
 
 :root {
@@ -19,7 +19,7 @@ html {
 }
 
 body {
-    background-image: url('../../assets/images/clouds.png');
+    background-image: url('../assets/images/clouds.png');
     height: 100vh;
     background-size: cover;
     background-position: left;
