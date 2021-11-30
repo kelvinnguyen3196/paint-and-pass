@@ -1,20 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Paint and Pass</title>
     <link rel="stylesheet" href="./css/style.css">
+    <script src="./js/index.js" defer></script>
 </head>
-<body>
-    <div class="flex-column">
-        <h1 class="title">Paint and Pass</h1>
-        <h2 class="subtitle">Swap paintings every five minutes</h2>
 
-        <div class="button">
-            <h3 class="button-text">Get started</h3>
+<body>
+    <div class="grid-container">
+        <div id="landing-wrapper" class="landing-wrapper">
+            <div class="flex-column">
+                <h1 class="title">Paint and Pass</h1>
+                <h2 class="subtitle">Swap paintings every five minutes</h2>
+
+                <div id="get-started-button" class="button">
+                    <h3 class="button-text">Get started</h3>
+                </div>
+            </div>
+        </div>
+
+        <div id="settings-wrapper" class="settings-wrapper">
+            <div class="settings-box">
+                <h1 class="settings-title">Paint and Pass</h1>
+                <div class="settings-input">
+                    <h2>Name</h2>
+                    <input type="text" id="name-input" >
+                </div>
+                <div class="settings-input">
+                    <h2>Room ID</h2>
+                    <input type="text" id="room-id-input">
+                </div>
+                <div id="settings-button" class="button">
+                    <h3 class="button-text">Join</h3>
+                </div>
+            </div>
         </div>
     </div>
 </body>
+
 </html>

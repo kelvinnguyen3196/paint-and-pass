@@ -19,12 +19,8 @@ html {
 }
 
 body {
-    background-image: url('../assets/images/clouds.png');
-    height: 100vh;
-    background-size: cover;
-    background-position: left;
-    margin: 0;
     background-color: var(--color-creamy-white);
+    margin: 0;
 }
 /* general */
 /* titles */
@@ -46,6 +42,23 @@ h3 {
     color: var(--color-creamy-white);
 }
 /* main content */
+.grid-container {
+    display: grid;
+}
+
+.landing-wrapper, .settings-wrapper {
+    height: 100vh;
+    background-size: cover;
+    background-position: left;
+    grid-row: 1;
+    grid-column: 1;
+}
+
+.landing-wrapper {
+    background-image: url('../assets/images/clouds.png');
+    z-index: 1;
+}
+
 .flex-column {
     display: flex;
     flex-direction: column;
@@ -91,4 +104,69 @@ h3 {
 .button:active {
     /* opacity: 0.8; */
     top: 2px;
+}
+/* settings screen styling */
+.settings-wrapper {
+    background-image: url('../assets/images/full_clouds.png');
+    background-color: var(--color-creamy-white);
+    opacity: 0;
+}
+
+.settings-box {
+    height: 40vh;
+    max-width: 40vw;
+    background-color: var(--color-creamy-white);
+    padding: 2rem 3rem;
+    display: flex;
+    flex-direction: column;
+    margin: 3rem;
+    border-radius: 1rem;
+    gap: 1.5rem;
+}
+
+.settings-title {
+    font-size: 60px;
+    margin-block: 0;
+}
+
+.settings-input {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.settings-input h2 {
+    width: 200px;
+    margin-block: 0;
+}
+
+#name-input, #room-id-input {
+    flex-grow: 1;
+    height: 2rem;
+    font-size: 1.5rem;
+    padding: 0.3rem 0.5rem;
+    border: 3px solid var(--color-title-blue);
+    border-radius: 5px;
+}
+
+#name-input:active, #room-id-input:active, #name-input:focus, #room-id-input:focus {
+    outline: none;
+}
+
+#settings-button {
+    margin-top: auto;
+    padding-inline: 3.3rem;
+}
+/* opacity styling and toggles */
+#landing-wrapper, #settings-wrapper {
+    transition: opacity 1s ease;
+}
+
+#landing-wrapper.fade, #settings-wrapper.fade {
+    opacity: 0;
+}
+
+#landing-wrapper.noFade, #settings-wrapper.noFade {
+    opacity: 1;
 }
