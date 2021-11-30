@@ -1,0 +1,27 @@
+{
+  "name": "paint-and-pass",
+  "version": "1.0.0",
+  "description": "Swap paintings every five minutes",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kelvinnguyen3196/paint-and-pass.git"
+  },
+  "author": "Kelvin Nguyen",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kelvinnguyen3196/paint-and-pass/issues"
+  },
+  "homepage": "https://github.com/kelvinnguyen3196/paint-and-pass#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "socket.io": "^4.4.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
