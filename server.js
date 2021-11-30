@@ -103,6 +103,21 @@ io.on('connection', socket => {
         socket.emit('check-for-others', otherPlayersInfo);
     });
     // #endregion
+    // #region 'player-ready' let other players know player is ready
+    socket.on('player-ready', () => {
+        // set ready on server
+        for(let i = 0; i < connections[room].length; i++) {
+            if(!connections[room][i]) { // skip over null
+                continue;
+            }
+            if(connections[room][i]['name'] === userName) {
+                connections[room][i]['ready'] = true;
+            }
+        }
+        // send out which player is ready
+        io.to(room).emit('friend-ready', userName);
+    });
+    // #endregion
 });
 
 const PORT = process.env.PORT || 3000;

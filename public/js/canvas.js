@@ -8,10 +8,12 @@ const roomId = params.room;
 document.getElementById('modal-playerName').innerHTML = userName;
 document.getElementById('room-id').innerHTML = roomId;
 
+const modalReady = document.getElementById('modal-button');
+
 // socket.io variables
 let userReady = false;
 let friendReady = false;
-let friendConnected = false;
+// let friendConnected = false;
 let bothReady = false;
 
 let mainSocket = false; // we assume we aren't main socket unless otherwise told
@@ -51,7 +53,18 @@ let s = sketch => {
         // socket.io
             // most if actions should contain if(mainSocket)
                 // this is so that actions only happen once
-
+        // add event listener on ready button
+        modalReady.addEventListener('click', () => {
+            socket.emit('player-ready');
+            // we know we are ready, so toggle
+            toggleReadyDot('ready-dotPlayer', 'green', userName);
+            userReady = true;
+            // check if we are both ready
+            if(userReady && friendReady) {
+                bothReady = true;
+                document.getElementById('waiting-modal-wrapper').style.display = 'none';
+            }
+        });
         // I. socket.emit
         // #region 'newPlayer' let server know we connected
         socket.emit('newPlayer', params);
@@ -98,6 +111,21 @@ let s = sketch => {
             toggleReadyDot('ready-dotFriend', friendColor, otherPlayer['name']);
         });
         // #endregion
+        // #region 'friend-ready' we now know friend is ready
+        socket.on('friend-ready', user => {
+            if(user === userName) { // we know we are ready
+                return;
+            }
+            friendReady = true;
+            toggleReadyDot('ready-dotFriend', 'green', user);
+            // check if we are both ready
+            if(friendReady && userReady) {
+                bothReady = true;
+                document.getElementById('waiting-modal-wrapper').style.display = 'none';
+            }
+        });
+        // #endregion
+
     }
 
     sketch.draw = () => {
