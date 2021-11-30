@@ -1,5 +1,6 @@
 const express = require('express');
 const http = require('http');
+const { connect } = require('http2');
 const path = require('path');
 const socketio = require('socket.io');
 
@@ -76,22 +77,29 @@ io.on('connection', socket => {
             // if name matched means this is the second socket 
             // i.e. not the main socket
             connections[room][matchIndex + 1] = newSocket;
+            console.log('1: ' + socket.id);
         }
         else {
             if(!connections[room][0]) { // first slot is empty
                 connections[room][0] = newSocket;
-                socket.emit('main-socket');
+                // socket.emit('main-socket');
+                // socket.emit('player-num', 0);
+                io.to(connections[room][0]['socket_id']).emit('player-num', 0);
+                io.to(connections[room][0]['socket_id']).emit('main-socket');
+                console.log('2: ' + socket.id);
             }
             else {  // second player slot is empty
                 connections[room][2] = newSocket;
                 socket.emit('main-socket');
+                socket.emit('player-num', 1);
+                console.log('3: ' + socket.id);
             }
         }
+        console.log(connections);
         // add socket to room
         socket.join(room);
         // let everyone know in this room that a new player has connected
         io.to(room).emit('new-player', userName);
-        console.log(connections);
     });
     // #endregion
     // #region 'check-for-others' when first arriving check if others are here
@@ -116,10 +124,26 @@ io.on('connection', socket => {
         }
         // send out which player is ready
         io.to(room).emit('friend-ready', userName);
-        console.log('ready check');
-        console.log(connections);
     });
     // #endregion
+    // #region 'both-ready' once both ready disable canvas
+    socket.on('both-ready', () => {
+        socket.emit('disable-canvas');
+    });
+    // #endregion
+    // #region 'disconnect'
+    socket.on('disconnect', () => {
+        for(let i = 0; i < connections[room].length; i++) {
+            if(!connections[room][i]) { // skip over null
+                continue;
+            }
+            // remove from connections
+            if(connections[room][i]['socket_id'] === socket.id) {
+                connections[room][i] = null;
+            }
+        }
+        io.to(room).emit('disconnected-player', userName);
+    });
 });
 
 const PORT = process.env.PORT || 3000;

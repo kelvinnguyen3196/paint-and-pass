@@ -156,6 +156,13 @@ input[type="range"]::-moz-range-track {
     height: calc(100vh - 3.125rem);
     width: 100vw;
     overflow: hidden;
+    display: grid;
+}
+
+#defaultCanvas0, #defaultCanvas1 {
+    grid-row: 1;
+    grid-column: 1;
+    display: block;
 }
 /* layers window styling */
 .layers-window {

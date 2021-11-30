@@ -16,8 +16,6 @@ let friendReady = false;
 // let friendConnected = false;
 let bothReady = false;
 
-let mainSocket = false; // we assume we aren't main socket unless otherwise told
-
 let s = sketch => {
     // key codes
     let qKey = 81;
@@ -35,6 +33,9 @@ let s = sketch => {
     let accessingTools;
 
     const socket = io();
+    // each sketch needs their own main socket
+    let mainSocket = false; // we assume we aren't main socket unless otherwise told
+    let playerNum = 3;          // p0 disables second canvas, p1 disables first canvas
 
     sketch.setup = () => {
         sketch.createCanvas(width, height);
@@ -53,26 +54,30 @@ let s = sketch => {
         // socket.io
             // most if actions should contain if(mainSocket)
                 // this is so that actions only happen once
-        // add event listener on ready button
-        modalReady.addEventListener('click', () => {
-            socket.emit('player-ready');
-            // we know we are ready, so toggle
-            toggleReadyDot('ready-dotPlayer', 'green', userName);
-            userReady = true;
-            // check if we are both ready
-            if(userReady && friendReady) {
-                bothReady = true;
-                document.getElementById('waiting-modal-wrapper').style.display = 'none';
-            }
-        });
         // I. socket.emit
         // #region 'newPlayer' let server know we connected
         socket.emit('newPlayer', params);
         socket.emit('check-for-others');
-        // assume we were able to connect unless told otherwise
-        toggleReadyDot('ready-dotPlayer', 'red', userName);
         // #endregion
-
+        // assume we were able to connect unless told otherwise
+        // race condition here, mainSocket doesn't return soon enough - should be ok
+        toggleReadyDot('ready-dotPlayer', 'red', userName);
+        // add event listener on ready button only once!
+        // race condition with mainSocket here too
+        modalReady.addEventListener('click', () => {
+            socket.emit('player-ready');
+            // we know we are ready, so toggle
+            // race condition here
+            toggleReadyDot('ready-dotPlayer', 'green', userName);
+            userReady = true;
+            // check if we are both ready
+            if(userReady && friendReady && mainSocket) {
+                bothReady = true;
+                document.getElementById('waiting-modal-wrapper').style.display = 'none';
+                socket.emit('both-ready');
+            }
+        });
+        
         // II. socket.on
         // #region 'room-full' redirect artist back to home page
         socket.on('room-full', () => {
@@ -98,19 +103,21 @@ let s = sketch => {
         // #endregion
         // #region 'check-for-others' receive info about other players
         socket.on('check-for-others', otherPlayersInfo => {
-            let otherPlayer;
-            // case where we are the first player, no one here yet
-            if(otherPlayersInfo['firstPlayer']['name'] === userName) {
-                return;
+            if(mainSocket) {
+                let otherPlayer;
+                // case where we are the first player, no one here yet
+                if(otherPlayersInfo['firstPlayer']['name'] === userName) {
+                    return;
+                }
+                else {
+                    otherPlayer = otherPlayersInfo['firstPlayer'];
+                }
+                // set other player dot and name
+                const friendColor = otherPlayer['ready'] ? 'green' : 'red';
+                toggleReadyDot('ready-dotFriend', friendColor, otherPlayer['name']);
+                // set friend ready status
+                friendReady = otherPlayer['ready'];
             }
-            else {
-                otherPlayer = otherPlayersInfo['firstPlayer'];
-            }
-            // set other player dot and name
-            const friendColor = otherPlayer['ready'] ? 'green' : 'red';
-            toggleReadyDot('ready-dotFriend', friendColor, otherPlayer['name']);
-            // set friend ready status
-            friendReady = otherPlayer['ready'];
         });
         // #endregion
         // #region 'friend-ready' we now know friend is ready
@@ -121,13 +128,70 @@ let s = sketch => {
             friendReady = true;
             toggleReadyDot('ready-dotFriend', 'green', user);
             // check if we are both ready
-            if(friendReady && userReady) {
+            if(friendReady && userReady && mainSocket) {
                 bothReady = true;
                 document.getElementById('waiting-modal-wrapper').style.display = 'none';
+                socket.emit('both-ready');
             }
         });
         // #endregion
+        // #region 'player-num' receive player num
+        socket.on('player-num', num => {
+            console.log(mainSocket);
+            if(mainSocket) {
+                console.log('got pNum ' + num);
+                playerNum = Number(num);
+            }
+        });
+        // #endregion
+        // #region 'disable-canvas' disable canvas
+        socket.on('disable-canvas', () => {
+            console.log('disabling...');
+            console.log(mainSocket);
+            if(playerNum === 0) {   // player 0 disables second canvas
+                document.getElementById('defaultCanvas1').style.display = 'none';
+            }
+            else if(playerNum === 1) {  // player 1 disables first canvas
+                document.getElementById('defaultCanvas0').style.display = 'none';
+            }
 
+            // add switch event listener
+            if(playerNum === 0 || playerNum === 1) {
+                console.log('once? pNum: ' + playerNum);
+                document.getElementById('switch-button').addEventListener('click', () => {
+                    if(playerNum === 0 || playerNum === 1) {
+                        const firstCanvas = document.getElementById('defaultCanvas0');
+                        const secondCanvas = document.getElementById('defaultCanvas1');
+                        const firstCanvasStyle = getComputedStyle(firstCanvas);
+                        const secondCanvasStyle = getComputedStyle(secondCanvas);
+                        console.log('new set: ');
+                        if(firstCanvasStyle.display === 'none') {
+                            document.getElementById('defaultCanvas0').style.display = 'block';
+                            console.log('option 1')
+                        }
+                        else {
+                            document.getElementById('defaultCanvas0').style.display = 'none';
+                            console.log('option 2')
+                        }
+                        if(secondCanvasStyle.display === 'none') {
+                            document.getElementById('defaultCanvas1').style.display = 'block';
+                            console.log('option 3')
+                        }
+                        else {
+                            document.getElementById('defaultCanvas1').style.display = 'none';
+                            console.log('option 4')
+                        }
+                    }
+                });
+            }
+        });
+        // #endregion
+        // #region 'disconnected-player' get info of who disconnect
+        socket.on('disconnected-player', user => {
+            // no need to check if it is
+            
+        });
+        // #endregion
     }
 
     sketch.draw = () => {
@@ -203,8 +267,10 @@ let s = sketch => {
     // #endregion
     // #region socket.io helper functions
     function toggleReadyDot(id, color, name) {
-        const readyDot = document.getElementById(id);
-        readyDot.classList.toggle(`${color}`);
+        // const readyDot = document.getElementById(id);
+        // readyDot.classList.toggle(`${color}`);
+        // console.log(color);
+        document.getElementById(id).style.backgroundColor = color;
 
         if(id === 'ready-dotFriend') {
             document.getElementById('modal-friendName').innerHTML = name;
@@ -213,7 +279,11 @@ let s = sketch => {
     // #endregion
 }
 
-let p5v1 = new p5(s, 'canvas-container');
+let firstCanvas = new p5(s, 'canvas-container');
+let secondCanvas;
+setTimeout(() => {
+    secondCanvas = new p5(s, 'canvas-container');
+}, 500);
 
 // prevent right click
 window.addEventListener('contextmenu', e => {
