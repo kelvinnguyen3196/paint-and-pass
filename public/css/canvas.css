@@ -1,6 +1,6 @@
 @font-face {
     font-family: 'Rubik Regular';
-    src: url('../../assets/fonts/Rubik/static/Rubik-Regular.ttf');
+    src: url('../assets/fonts/Rubik/static/Rubik-Regular.ttf');
 }
 
 :root {
