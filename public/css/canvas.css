@@ -3,6 +3,16 @@
     src: url('../assets/fonts/Rubik/static/Rubik-Regular.ttf');
 }
 
+@font-face {
+    font-family: 'Rubik Bold';
+    src: url('../assets/fonts/Rubik/static/Rubik-Bold.ttf');
+}
+
+@font-face {
+    font-family: 'Monoton';
+    src: url('../assets/fonts/Monoton/Monoton-Regular.ttf');
+}
+
 :root {
     --color-creamy-white: #fff9ef;
     --color-cloud-orange: #dd6b6f;
@@ -96,6 +106,7 @@ p {
     align-items: center;
     background-color: var(--color-title-blue);
     border-radius: 5px;
+    z-index: 1;
 }
 
 input[type="range"] {
@@ -204,4 +215,125 @@ input[type="range"]::-moz-range-track {
 /* hovers */
 .tool:hover, .layers-tool:hover {
     cursor: pointer;
+}
+/* waiting modal */
+.waiting-modal-wrapper {
+    position: absolute;
+    height: 100vh;
+    width: 100vw;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.waiting-modal-box {
+    height: 50vh;
+    width: 50vw;
+    background-color: var(--color-creamy-white);
+    border-radius: 15px;
+    background-image: url('../assets/images/low_opacity_clouds.png');
+    background-size: cover;
+    background-position: left;
+    padding: 1rem 2rem;
+    display: flex;
+    flex-direction: column;
+}
+
+h1, h2 {
+    margin-block: 0;
+}
+
+h1 {
+    font-family: 'Monoton';
+    color: var(--color-cloud-orange);
+    font-size: 50px;
+}
+
+h2 {
+    font-family: 'Rubik Regular';
+    color: var(--color-title-blue);
+    font-size: 30px;
+}
+
+.modal-player-info {
+    margin-block: auto;
+}
+
+.modal-player-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.modal-player-row + .modal-player-row {
+    margin-top: 0.5rem;
+}
+
+#modal-playerName {
+    font-family: 'Rubik Bold';
+}
+
+.ready-dot {
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background-color: lightslategray;
+}
+
+.ready-dot.red {
+    background-color: red;;
+}
+
+.ready-dot.green {
+    background-color: green;
+}
+
+.ready-dot.gray {
+    background-color: lightslategray;
+}
+
+h3 {
+    font-family: 'Rubik Regular';
+    font-size: 1.563rem;
+    color: var(--color-creamy-white);
+}
+
+.button-text {
+    -webkit-user-select: none; /* Safari */ 
+    -moz-user-select: none; /* Firefox */ 
+    -ms-user-select: none; /* IE10+/Edge */
+    user-select: none; /* Standard */
+    margin-block: 0;
+}
+
+.button {
+    background: var(--color-title-blue);
+    width: fit-content;
+    padding: 1rem 2rem;
+    border-radius: 1rem;
+    position: relative;
+}
+
+.button:hover {
+    cursor: pointer;
+    filter: brightness(1.2);
+}
+
+.button:active {
+    /* opacity: 0.8; */
+    top: 2px;
+}
+
+#settings-button {
+    margin-top: auto;
+    margin-bottom: 1rem;
+}
+
+.waiting-modal-box {
+    -webkit-user-select: none;  /* Safari */ 
+    -moz-user-select: none;     /* Firefox */ 
+    -ms-user-select: none;      /* IE10+/Edge */
+    user-select: none;          /* Standard */
 }

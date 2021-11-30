@@ -14,6 +14,29 @@
     <script src="../js/canvas.js" defer></script>
 </head>
 <body>
+
+    <div class="waiting-modal-wrapper">
+        <div class="waiting-modal-box">
+            <h1>Paint and Pass</h1>
+            <h2>Please wait until all players are ready...</h2>
+            
+            <div class="modal-player-info">
+                <div class="modal-player-row">
+                    <div id="ready-dotPlayer" class="ready-dot"></div>
+                    <h2 id="modal-playerName" class="modal-name">jsmile</h2>
+                </div>
+                <div class="modal-player-row">
+                    <div id="ready-dotFriend" class="ready-dot"></div>
+                    <h2 id="modal-friendName" class="modal-name">Waiting on another player...</h2>
+                </div>
+            </div>
+
+            <div id="modal-button" class="button">
+                <h3 class="button-text">Ready</h3>
+            </div>
+        </div>
+    </div>
+
     <div class="top-bar-container">
         <div class="top-bar">
             <svg id="brush-tool" class="tool" viewBox="0 0 24 24" fill="none">
