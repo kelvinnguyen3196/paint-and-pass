@@ -18,6 +18,93 @@ app.get('/canvas', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'html', 'canvas.html'));
 });
 
+// socket.io
+/* connections format
+- should only have four per [room_id]
+- new names are put into element 0 and 2 in [room_id]
+    - this allows for connections to happen at any time
+
+    [room_id]: [ { socket_id: _, name: _, ready: _ }, ... ]
+    ...
+    [room_id]: [ { socket_id: _, name: _, ready: _ }, ... ]
+*/
+const connections = {};
+io.on('connection', socket => {
+    let room;
+    let userName;
+    // #region 'newPlayer' adds new player to room
+    socket.on('newPlayer', params => {
+        room = params.room;
+        userName = params.name;
+        // if room does not exist, create new room
+        if(!connections[room]) {
+            connections[room] = [null, null, null, null];
+        }
+        // check if room is full
+        const twoConnected = connections[room][0] && connections[room][2];
+        let nameMatch = false;  // no match initially
+        let matchIndex;
+        for(let i = 0; i < connections[room].length; i++) {
+            if(!connections[room][i]) { // skip over null
+                continue;
+            }
+            if(connections[room][i]['name'] === userName) {
+                nameMatch = true;
+                matchIndex = i;
+                break;
+            }
+        }
+        // duplicate name case i.e. third socket with same name
+        if(connections[room][matchIndex] && connections[room][matchIndex + 1]) {
+            console.log(`Room ${room} is full! Sending a rejection...`);
+            socket.emit('room-full');
+            return;
+        }
+        // two connected and no name match
+        if(twoConnected && !nameMatch) {
+            console.log(`Room ${room} is full! Sending a rejection...`);
+            socket.emit('room-full');
+            return;
+        }
+        // add new user into room
+        const newSocket = {
+            socket_id: socket.id,
+            name: userName,
+            ready: false
+        }
+        if(nameMatch) {
+            // if name matched means this is the second socket 
+            // i.e. not the main socket
+            connections[room][matchIndex + 1] = newSocket;
+        }
+        else {
+            if(!connections[room][0]) { // first slot is empty
+                connections[room][0] = newSocket;
+                socket.emit('main-socket');
+            }
+            else {  // second player slot is empty
+                connections[room][2] = newSocket;
+                socket.emit('main-socket');
+            }
+        }
+        // add socket to room
+        socket.join(room);
+        // let everyone know in this room that a new player has connected
+        io.to(room).emit('new-player', userName);
+        console.log(connections);
+    });
+    // #endregion
+    // #region 'check-for-others' when first arriving check if others are here
+    socket.on('check-for-others', () => {
+        const otherPlayersInfo = {
+            firstPlayer: connections[room][0],
+            secondPlayer: connections[room][2]
+        }
+        socket.emit('check-for-others', otherPlayersInfo);
+    });
+    // #endregion
+});
+
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}...`);

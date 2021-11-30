@@ -1,13 +1,20 @@
 // waiting modal scripting
 const urlSearchParams = new URLSearchParams(window.location.search);
 const params = Object.fromEntries(urlSearchParams.entries());
-console.log(params);
 
 const userName = params.name;
 const roomId = params.room;
 
 document.getElementById('modal-playerName').innerHTML = userName;
 document.getElementById('room-id').innerHTML = roomId;
+
+// socket.io variables
+let userReady = false;
+let friendReady = false;
+let friendConnected = false;
+let bothReady = false;
+
+let mainSocket = false; // we assume we aren't main socket unless otherwise told
 
 let s = sketch => {
     // key codes
@@ -25,6 +32,8 @@ let s = sketch => {
     // is artist currently accessing tools like the slider?
     let accessingTools;
 
+    const socket = io();
+
     sketch.setup = () => {
         sketch.createCanvas(width, height);
         // not accessing tools at the start 
@@ -38,6 +47,57 @@ let s = sketch => {
         layerManager = new LayerManager();
         // set up first layer - we never draw on background
         layerManager.addLayer(new Layer(width, height, sketch), width, height, sketch, toolManager);
+
+        // socket.io
+            // most if actions should contain if(mainSocket)
+                // this is so that actions only happen once
+
+        // I. socket.emit
+        // #region 'newPlayer' let server know we connected
+        socket.emit('newPlayer', params);
+        socket.emit('check-for-others');
+        // assume we were able to connect unless told otherwise
+        toggleReadyDot('ready-dotPlayer', 'red', userName);
+        // #endregion
+
+        // II. socket.on
+        // #region 'room-full' redirect artist back to home page
+        socket.on('room-full', () => {
+            alert(`Room ${roomId} is full! Redirecting you back to home page...`);
+            window.location.href = 'http://localhost:3000/';
+        });
+        // #endregion
+        // #region 'main-socket' we know we are the main socket
+        socket.on('main-socket', () => {
+            mainSocket = true;
+        });
+        // #endregion
+        // #region 'new-player' new information about new player
+        socket.on('new-player', user => {
+            if(user === userName) { // we don't need to know we just connected
+                return;
+            }
+            if(mainSocket) {
+                // friend has connected but is not ready
+                toggleReadyDot('ready-dotFriend', 'red', user);
+            }
+        });
+        // #endregion
+        // #region 'check-for-others' receive info about other players
+        socket.on('check-for-others', otherPlayersInfo => {
+            let otherPlayer;
+            // case where we are the first player, no one here yet
+            if(otherPlayersInfo['firstPlayer']['name'] === userName) {
+                return;
+            }
+            else {
+                otherPlayer = otherPlayersInfo['firstPlayer'];
+            }
+            // set other player dot and name
+            const friendColor = otherPlayer['ready'] ? 'green' : 'red';
+            toggleReadyDot('ready-dotFriend', friendColor, otherPlayer['name']);
+        });
+        // #endregion
     }
 
     sketch.draw = () => {
@@ -50,7 +110,7 @@ let s = sketch => {
     }
 
     sketch.mouseDragged = () => {
-        if(!accessingTools && toolManager.currentTool === 'brush-tool') {
+        if(bothReady && !accessingTools && toolManager.currentTool === 'brush-tool') {
             const currentColor = document.getElementById('color-selector').value;
             const currentRadius = document.getElementById('brush-size').value;
             const currentOpacity = document.getElementById('brush-opacity').value;
@@ -64,7 +124,7 @@ let s = sketch => {
             // to divide by two to get an accurate size
             layerManager.paintOnLayer(currentColorRGBA, Number(currentRadius) / 2, sketch.mouseX, sketch.mouseY, width, sketch);
         }
-        if(!accessingTools && toolManager.currentTool === 'eraser-tool') {
+        if(bothReady && !accessingTools && toolManager.currentTool === 'eraser-tool') {
             const eraserColor = sketch.color(0, 0);
             const currentRadius = document.getElementById('brush-size').value;
 
@@ -108,6 +168,16 @@ let s = sketch => {
         }
         else if(sketch.keyCode === eKey) {
             toolManager.setTool('layer-tool', layerManager, width, height, sketch);
+        }
+    }
+    // #endregion
+    // #region socket.io helper functions
+    function toggleReadyDot(id, color, name) {
+        const readyDot = document.getElementById(id);
+        readyDot.classList.toggle(`${color}`);
+
+        if(id === 'ready-dotFriend') {
+            document.getElementById('modal-friendName').innerHTML = name;
         }
     }
     // #endregion
