@@ -109,6 +109,8 @@ let s = sketch => {
             // set other player dot and name
             const friendColor = otherPlayer['ready'] ? 'green' : 'red';
             toggleReadyDot('ready-dotFriend', friendColor, otherPlayer['name']);
+            // set friend ready status
+            friendReady = otherPlayer['ready'];
         });
         // #endregion
         // #region 'friend-ready' we now know friend is ready

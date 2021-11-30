@@ -116,6 +116,8 @@ io.on('connection', socket => {
         }
         // send out which player is ready
         io.to(room).emit('friend-ready', userName);
+        console.log('ready check');
+        console.log(connections);
     });
     // #endregion
 });
