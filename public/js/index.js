@@ -12,8 +12,6 @@ getStartedButton.addEventListener('click', function() {
     }, 1000);
 });
 
-
-
 // enter canvas
 const joinButton = document.getElementById('settings-button');
 joinButton.addEventListener('click', () => {
@@ -34,4 +32,23 @@ joinButton.addEventListener('click', () => {
     }
 
     window.location.href = `http://localhost:3000/canvas?name=${userName}&room=${userRoom}`;
+});
+
+// enter button in input text event listeners
+document.getElementById('name-input').addEventListener('keyup', function(event) {
+    if(event.keyCode === 13) {
+        if(!document.getElementById('name-input').value) {
+            return;
+        }
+        document.getElementById('settings-button').click();
+    }
+});
+
+document.getElementById('room-id-input').addEventListener('keyup', function(event) {
+    if(event.keyCode === 13) {
+        if(!document.getElementById('name-input').value) {
+            return;
+        }
+        document.getElementById('settings-button').click();
+    }
 });
