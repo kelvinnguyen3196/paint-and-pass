@@ -31,91 +31,89 @@ app.get('/canvas', (req, res) => {
 */
 const connections = {};
 io.on('connection', socket => {
-    let room;
-    let userName;
-    // #region 'newPlayer' adds new player to room
-    socket.on('newPlayer', params => {
-        room = params.room;
-        userName = params.name;
-        // if room does not exist, create new room
-        if(!connections[room]) {
-            connections[room] = [null, null, null, null];
+    // #region introductory connection set up
+    let room = socket.handshake.query.roomId;
+    let userName = socket.handshake.query.userName;
+    // if room does not exist, create new room
+    if(!connections[room]) {
+        connections[room] = [null, null, null, null];
+    }
+    // check if room is full - first canvas socket will occupy 0 and 2
+    const twoConnected = connections[room][0] && connections[room][2];
+    let nameMatch = false;
+    let matchIndex;
+    // check for name match
+    for(let i = 0; i < connections[room].length; i++) {
+        if(!connections[room][i]) { // skip over null
+            continue;
         }
-        // check if room is full
-        const twoConnected = connections[room][0] && connections[room][2];
-        let nameMatch = false;  // no match initially
-        let matchIndex;
-        for(let i = 0; i < connections[room].length; i++) {
-            if(!connections[room][i]) { // skip over null
-                continue;
-            }
-            if(connections[room][i]['name'] === userName) {
-                nameMatch = true;
-                matchIndex = i;
-                break;
-            }
+        if(connections[room][i]['name'] === userName) {
+            nameMatch = true;
+            matchIndex = i;
+            break;
         }
-        // duplicate name case i.e. third socket with same name
-        if(connections[room][matchIndex] && connections[room][matchIndex + 1]) {
-            console.log(`Room ${room} is full! Sending a rejection...`);
-            socket.emit('room-full');
-            return;
-        }
-        // two connected and no name match
-        if(twoConnected && !nameMatch) {
-            console.log(`Room ${room} is full! Sending a rejection...`);
-            socket.emit('room-full');
-            return;
-        }
-        // add new user into room
-        const newSocket = {
-            socket_id: socket.id,
-            name: userName,
-            ready: false
-        }
-        if(nameMatch) {
-            // if name matched means this is the second socket 
-            // i.e. not the main socket
-            connections[room][matchIndex + 1] = newSocket;
-            console.log('1: ' + socket.id);
+    }
+    // duplicate name case i.e. third socket with same name
+    if(connections[room][matchIndex] && connections[room][matchIndex + 1]) {
+        console.log(`Room ${room} is full! Sending a rejection...`);
+        socket.emit('room-full');
+        return;
+    }
+    // two connected and no name match
+    if(twoConnected && !nameMatch) {
+        console.log(`Room ${room} is full! Sending a rejection...`);
+        socket.emit('room-full');
+        return;
+    }
+    // add new user into room
+    const newSocket = {
+        socket_id: socket.id,
+        name: userName,
+        ready: false
+    }
+    // add socket to connections data structure and let each socket which socket 
+    // they are
+    console.log(socket.id);
+    if(nameMatch) {
+        // same name with space means this is the second canvas
+        connections[room][matchIndex + 1] = newSocket;
+        socket.emit('socket-num', (matchIndex + 1));
+        console.log('option 1');
+    }
+    else {
+        if(!connections[room][0]) { // first slot is empty
+            connections[room][0] = newSocket;
+            socket.emit('socket-num', 0);
+            console.log('option 2');
+
         }
         else {
-            if(!connections[room][0]) { // first slot is empty
-                connections[room][0] = newSocket;
-                // socket.emit('main-socket');
-                // socket.emit('player-num', 0);
-                io.to(connections[room][0]['socket_id']).emit('main-socket');
-                io.to(connections[room][0]['socket_id']).emit('player-num', 0);
-                console.log('2: ' + socket.id);
-            }
-            else {  // second player slot is empty
-                connections[room][2] = newSocket;
-                // socket.emit('main-socket');
-                // socket.emit('player-num', 1);
-                io.to(connections[room][2]['socket_id']).emit('main-socket');
-                io.to(connections[room][2]['socket_id']).emit('player-num', 1);
-                console.log('3: ' + socket.id);
-            }
+            connections[room][2] = newSocket;
+            socket.emit('socket-num', 2);
+            console.log('option 3');
+
         }
-        console.log(connections);
-        // add socket to room
-        socket.join(room);
-        // let everyone know in this room that a new player has connected
-        io.to(room).emit('new-player', userName);
-    });
+    }
+    socket.join(room);
+    // TODO: add socket id and userName as an object so the main socket only does
+        // TODO: things once
+    io.to(room).emit('new-player', userName);
+    console.log(connections);
     // #endregion
-    // #region 'check-for-others' when first arriving check if others are here
-    socket.on('check-for-others', () => {
-        const otherPlayersInfo = {
+    /*
+    ==================== socket.on ====================
+    */
+    // #region 'check-players' send back socket information about other players
+    socket.on('check-players', () => {
+        const players = {
             firstPlayer: connections[room][0],
             secondPlayer: connections[room][2]
         }
-        socket.emit('check-for-others', otherPlayersInfo);
+        socket.emit('check-players', players);
     });
     // #endregion
-    // #region 'player-ready' let other players know player is ready
+    // #region 'player-ready' let other players know a player is ready
     socket.on('player-ready', () => {
-        // set ready on server
         for(let i = 0; i < connections[room].length; i++) {
             if(!connections[room][i]) { // skip over null
                 continue;
@@ -124,28 +122,19 @@ io.on('connection', socket => {
                 connections[room][i]['ready'] = true;
             }
         }
-        // send out which player is ready
+        // send out which player is ready to other player
         io.to(room).emit('friend-ready', userName);
     });
     // #endregion
-    // #region 'both-ready' once both ready disable canvas
+    // #region 'both-ready' both are ready - sent bothReady = true for ALL sockets
     socket.on('both-ready', () => {
-        socket.emit('disable-canvas');
+        // send out message to every socket
+        io.to(room).emit('both-ready');
+        console.log('both-ready');
+        console.log(connections);
     });
     // #endregion
-    // #region 'disconnect'
-    socket.on('disconnect', () => {
-        for(let i = 0; i < connections[room].length; i++) {
-            if(!connections[room][i]) { // skip over null
-                continue;
-            }
-            // remove from connections
-            if(connections[room][i]['socket_id'] === socket.id) {
-                connections[room][i] = null;
-            }
-        }
-        io.to(room).emit('disconnected-player', userName);
-    });
+    
 });
 
 const PORT = process.env.PORT || 3000;

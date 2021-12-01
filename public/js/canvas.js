@@ -10,12 +10,6 @@ document.getElementById('room-id').innerHTML = roomId;
 
 const modalReady = document.getElementById('modal-button');
 
-// socket.io variables
-let userReady = false;
-let friendReady = false;
-// let friendConnected = false;
-let bothReady = false;
-
 let s = sketch => {
     // key codes
     let qKey = 81;
@@ -32,10 +26,14 @@ let s = sketch => {
     // is artist currently accessing tools like the slider?
     let accessingTools;
 
-    const socket = io();
-    // each sketch needs their own main socket
-    let mainSocket = false; // we assume we aren't main socket unless otherwise told
-    let playerNum = 3;          // p0 disables second canvas, p1 disables first canvas
+    // socket.io variables
+    const socket = io({
+        query: {
+            roomId: roomId,
+            userName: userName
+        }
+    });
+    let bothReady = false;
 
     sketch.setup = () => {
         sketch.createCanvas(width, height);
@@ -52,147 +50,147 @@ let s = sketch => {
         layerManager.addLayer(new Layer(width, height, sketch), width, height, sketch, toolManager);
 
         // socket.io
-            // most if actions should contain if(mainSocket)
-                // this is so that actions only happen once
-        // I. socket.emit
-        // #region 'newPlayer' let server know we connected
-        socket.emit('newPlayer', params);
-        socket.emit('check-for-others');
-        // #endregion
-        // assume we were able to connect unless told otherwise
-        // race condition here, mainSocket doesn't return soon enough - should be ok
-        toggleReadyDot('ready-dotPlayer', 'red', userName);
-        // add event listener on ready button only once!
-        // race condition with mainSocket here too
-        modalReady.addEventListener('click', () => {
-            socket.emit('player-ready');
-            // we know we are ready, so toggle
-            // race condition here
-            toggleReadyDot('ready-dotPlayer', 'green', userName);
-            userReady = true;
-            // check if we are both ready
-            if(userReady && friendReady && mainSocket) {
-                bothReady = true;
-                document.getElementById('waiting-modal-wrapper').style.display = 'none';
-                socket.emit('both-ready');
-            }
-        });
-        
-        // II. socket.on
-        // #region 'room-full' redirect artist back to home page
+        /*
+        ==================== variables ====================
+        */ // individual variables to each socket
+        let socketNum;
+        let userReady = false;
+        let friendReady = false;
+        /*
+        ==================== socket.on ====================
+        */
+        // #region 'room-full' kick player our
         socket.on('room-full', () => {
+            // TODO: change alert to custom alert
             alert(`Room ${roomId} is full! Redirecting you back to home page...`);
-            window.location.href = 'http://localhost:3000/';
+            window.location.href = 'http://localhost:3000';
         });
         // #endregion
-        // #region 'main-socket' we know we are the main socket
-        socket.on('main-socket', () => {
-            console.log('main scoket called');
-            mainSocket = true;
+        // #region 'socket-num' receive socket number
+        socket.on('socket-num', num => {
+            socketNum = Number(num);
+            // only leader sockets allowed
+            console.log('socket-num start');
+            DEVELOPER_logSocketNumbers();
+            if(socketNum === 1 || socketNum === 3) return;
+            // add ready button event listener since this is only called once
+            document.getElementById('modal-button').addEventListener('click', () => {
+                // set our status to green
+                toggleReadyDotAndStatus('ready-dotPlayer', 'green', userName);
+                // let server know we are ready
+                socket.emit('player-ready');
+                // check if we are both ready
+                checkIfBothReady();
+            });
+            console.log('socket-num end')
+            DEVELOPER_logSocketNumbers();
         });
         // #endregion
-        // #region 'new-player' new information about new player
+        // #region 'new-player' new information about new player, including self
         socket.on('new-player', user => {
-            if(user === userName) { // we don't need to know we just connected
+            // only leader sockets
+            if(socketNum === 1 || socketNum === 3) return;
+            // only sockets 0 and 2 should remain
+            if(user === userName) {
+                toggleReadyDotAndStatus('ready-dotPlayer', 'red', user);
+            }
+            else {
+                toggleReadyDotAndStatus('ready-dotFriend', 'red', user);
+            }
+            // once we are checked in ask server about other players info
+            socket.emit('check-players');
+        });
+        // #endregion
+        // #region 'check-players' receive info about other players in room
+        socket.on('check-players', players => {
+            // on leader sockets allowed
+            if(socketNum === 1 || socketNum === 3) return;
+            // if we are first player we will or have received notification of a
+            // new player from 'new-player'
+            let otherPlayer;
+            if(players['firstPlayer']['name'] === userName) {
                 return;
             }
-            if(mainSocket) {
-                // friend has connected but is not ready
-                toggleReadyDot('ready-dotFriend', 'red', user);
+            else {  // case where are are the second player and we arrived later
+                otherPlayer = players['firstPlayer'];
             }
-        });
-        // #endregion
-        // #region 'check-for-others' receive info about other players
-        socket.on('check-for-others', otherPlayersInfo => {
-            if(mainSocket) {
-                let otherPlayer;
-                // case where we are the first player, no one here yet
-                if(otherPlayersInfo['firstPlayer']['name'] === userName) {
-                    return;
-                }
-                else {
-                    otherPlayer = otherPlayersInfo['firstPlayer'];
-                }
-                // set other player dot and name
-                const friendColor = otherPlayer['ready'] ? 'green' : 'red';
-                toggleReadyDot('ready-dotFriend', friendColor, otherPlayer['name']);
-                // set friend ready status
-                friendReady = otherPlayer['ready'];
-            }
+            // set friend color
+            const friendStatusColor = otherPlayer['ready'] ? 'green' : 'red';
+            toggleReadyDotAndStatus('ready-dotFriend', friendStatusColor, otherPlayer['name']);
         });
         // #endregion
         // #region 'friend-ready' we now know friend is ready
         socket.on('friend-ready', user => {
-            if(user === userName) { // we know we are ready
-                return;
-            }
+            // we know we are ready
+            if(user === userName) return;
+            // otherwise our friend is ready
             friendReady = true;
-            toggleReadyDot('ready-dotFriend', 'green', user);
+            toggleReadyDotAndStatus('ready-dotFriend', 'green', user);
             // check if we are both ready
-            if(friendReady && userReady && mainSocket) {
+            checkIfBothReady();
+        });
+        // #endregion
+        // #region 'both-ready'
+        socket.on('both-ready', () => {
+            bothReady = true;
+            // leader sockets will turn off canvas
+            if(socketNum === 1 || socketNum === 3) return;
+            // turn off canvas
+            if(socketNum === 0) {   // p0 turns off second canvas
+                document.getElementById('defaultCanvas0').style.display = 'block';
+                document.getElementById('defaultCanvas1').style.display = 'none';
+            }
+            else if(socketNum === 2) {  // p1 turns off first canvas
+                document.getElementById('defaultCanvas0').style.display = 'none';
+                document.getElementById('defaultCanvas1').style.display = 'block';
+            }
+        });
+        // #endregion
+        /*
+        ==================== helper functions ====================
+        */
+        // #region helper functions
+        function toggleReadyDotAndStatus(id, color, name) {
+            document.getElementById(id).style.backgroundColor = color;
+            // set friend name
+            if(id === 'ready-dotFriend') {
+                document.getElementById('modal-friendName').innerHTML = name;
+            }
+            // toggle ready boolean for friend
+            if(id === 'ready-dotFriend' && color === 'green') {
+                friendReady = true;
+            }
+            else if(id === 'ready-dotFriend' && color === 'red') {
+                friendReady = false;
+            }
+            // toggle ready boolean for self
+            if(id === 'ready-dotPlayer' && color === 'green') {
+                userReady = true;
+            }
+            else if(id === 'ready-dotPlayer' && color === 'red') {
+                userReady = false;
+            }
+        }
+        // make sure to only have sockets 0 and 2 call this function
+        function checkIfBothReady() {
+            if(userReady && friendReady) {
                 bothReady = true;
                 document.getElementById('waiting-modal-wrapper').style.display = 'none';
                 socket.emit('both-ready');
-                console.log('kelvin?');
             }
-        });
+        }
         // #endregion
-        // #region 'player-num' receive player num
-        socket.on('player-num', num => {
-            console.log(mainSocket);
-            if(mainSocket) {
-                console.log('got pNum ' + num);
-                playerNum = Number(num);
-            }
-        });
-        // #endregion
-        // #region 'disable-canvas' disable canvas
-        socket.on('disable-canvas', () => {
-            console.log('disabling...');
-            console.log(mainSocket);
-            if(playerNum === 0) {   // player 0 disables second canvas
-                document.getElementById('defaultCanvas1').style.display = 'none';
-            }
-            else if(playerNum === 1) {  // player 1 disables first canvas
-                document.getElementById('defaultCanvas0').style.display = 'none';
-            }
+        /*
+        ==================== developer functions ====================
+        */
+        // #region developer functions
+        function DEVELOPER_logReadyStatus() {
+            console.log(`s${socketNum}: u-${userReady}; f-${friendReady}; b-${bothReady}`);
+        }
 
-            // add switch event listener
-            if(playerNum === 0 || playerNum === 1) {
-                console.log('once? pNum: ' + playerNum);
-                document.getElementById('switch-button').addEventListener('click', () => {
-                    if(playerNum === 0 || playerNum === 1) {
-                        const firstCanvas = document.getElementById('defaultCanvas0');
-                        const secondCanvas = document.getElementById('defaultCanvas1');
-                        const firstCanvasStyle = getComputedStyle(firstCanvas);
-                        const secondCanvasStyle = getComputedStyle(secondCanvas);
-                        console.log('new set: ');
-                        if(firstCanvasStyle.display === 'none') {
-                            document.getElementById('defaultCanvas0').style.display = 'block';
-                            console.log('option 1')
-                        }
-                        else {
-                            document.getElementById('defaultCanvas0').style.display = 'none';
-                            console.log('option 2')
-                        }
-                        if(secondCanvasStyle.display === 'none') {
-                            document.getElementById('defaultCanvas1').style.display = 'block';
-                            console.log('option 3')
-                        }
-                        else {
-                            document.getElementById('defaultCanvas1').style.display = 'none';
-                            console.log('option 4')
-                        }
-                    }
-                });
-            }
-        });
-        // #endregion
-        // #region 'disconnected-player' get info of who disconnect
-        socket.on('disconnected-player', user => {
-            // no need to check if it is
-            
-        });
+        function DEVELOPER_logSocketNumbers() {
+            console.log(`socket ${socketNum}`);
+        }
         // #endregion
     }
 
@@ -264,18 +262,6 @@ let s = sketch => {
         }
         else if(sketch.keyCode === eKey) {
             toolManager.setTool('layer-tool', layerManager, width, height, sketch);
-        }
-    }
-    // #endregion
-    // #region socket.io helper functions
-    function toggleReadyDot(id, color, name) {
-        // const readyDot = document.getElementById(id);
-        // readyDot.classList.toggle(`${color}`);
-        // console.log(color);
-        document.getElementById(id).style.backgroundColor = color;
-
-        if(id === 'ready-dotFriend') {
-            document.getElementById('modal-friendName').innerHTML = name;
         }
     }
     // #endregion
