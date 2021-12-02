@@ -73,24 +73,24 @@ io.on('connection', socket => {
     }
     // add socket to connections data structure and let each socket which socket 
     // they are
-    console.log(socket.id);
+    let socketNum;
     if(nameMatch) {
         // same name with space means this is the second canvas
         connections[room][matchIndex + 1] = newSocket;
         socket.emit('socket-num', (matchIndex + 1));
-        console.log('option 1');
+        socketNum = matchIndex + 1;
     }
     else {
         if(!connections[room][0]) { // first slot is empty
             connections[room][0] = newSocket;
-            socket.emit('socket-num', 0);
-            console.log('option 2');
+            socketNum = 0;
+            socket.emit('socket-num', socketNum);
 
         }
         else {
             connections[room][2] = newSocket;
-            socket.emit('socket-num', 2);
-            console.log('option 3');
+            socketNum = 2;
+            socket.emit('socket-num', socketNum);
 
         }
     }
@@ -98,7 +98,11 @@ io.on('connection', socket => {
     // TODO: add socket id and userName as an object so the main socket only does
         // TODO: things once
     io.to(room).emit('new-player', userName);
-    console.log(connections);
+    // secondary sockets only
+    if(socketNum === 1 || socketNum === 3) {
+        console.log('========== socket connection ===========');
+        console.log(connections);
+    }
     // #endregion
     /*
     ==================== socket.on ====================
@@ -130,11 +134,45 @@ io.on('connection', socket => {
     socket.on('both-ready', () => {
         // send out message to every socket
         io.to(room).emit('both-ready');
-        console.log('both-ready');
-        console.log(connections);
     });
     // #endregion
-    
+    // #region 'disconnect'
+    socket.on('disconnect', () => {
+        // if room does not exist, then it's probably from an older connectinos
+        // before the server restart
+        let socketNum;
+        // room does not exist leave function
+        if(!connections[room]) return;
+        // loop through and remove user from room
+        for(let i = 0; i < connections[room].length; i++) {
+            // skip over null sockets
+            if(!connections[room][i]) continue;
+            // remove from connections
+            if(connections[room][i]['socket_id'] === socket.id) {
+                connections[room][i] = null;
+                socketNum = i;
+                break;
+            }
+        }
+        // check to see if room is empty to delete
+        let emptyRoom = true;   // assume true
+        for(let i = 0; i < connections[room].length; i++) {
+            // there is still a connection here
+            if(connections[room][i] !== null) {
+                emptyRoom = false;
+            }
+        }
+        if(emptyRoom) {
+            delete connections[room];
+        }
+        // debug log
+        console.log('========== socket removal ===========');
+        console.log(connections);
+        // leader sockets let other player in room know
+        if(socketNum === 1 || socketNum === 3) return;
+        io.to(room).emit('disconnected-player', userName);
+    }); 
+    // #endregion
 });
 
 const PORT = process.env.PORT || 3000;

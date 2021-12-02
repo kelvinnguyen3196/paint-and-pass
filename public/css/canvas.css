@@ -292,6 +292,7 @@ h2 {
     width: 20px;
     border-radius: 50%;
     background-color: lightslategray;
+    flex-shrink: 0;
 }
 
 .ready-dot.red {

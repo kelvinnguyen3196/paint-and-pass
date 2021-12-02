@@ -13,3 +13,5 @@
     - update: input color window shows up in a different window and i just 
     didn't see it
 - [] change size on canvas on window resize?
+- [] get started button on landing page can be clicked multiple times and mess up the page
+    - remove the listener once it is clicked

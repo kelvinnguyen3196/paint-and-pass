@@ -56,6 +56,7 @@ let s = sketch => {
         let socketNum;
         let userReady = false;
         let friendReady = false;
+        let homeRedirectAlert = false;  // prevent multiple redirect alerts
         /*
         ==================== socket.on ====================
         */
@@ -70,8 +71,6 @@ let s = sketch => {
         socket.on('socket-num', num => {
             socketNum = Number(num);
             // only leader sockets allowed
-            console.log('socket-num start');
-            DEVELOPER_logSocketNumbers();
             if(socketNum === 1 || socketNum === 3) return;
             // add ready button event listener since this is only called once
             document.getElementById('modal-button').addEventListener('click', () => {
@@ -82,8 +81,6 @@ let s = sketch => {
                 // check if we are both ready
                 checkIfBothReady();
             });
-            console.log('socket-num end')
-            DEVELOPER_logSocketNumbers();
         });
         // #endregion
         // #region 'new-player' new information about new player, including self
@@ -146,6 +143,31 @@ let s = sketch => {
             }
         });
         // #endregion
+        // #region 'disconnected-player' handler when friend disconencted
+        socket.on('disconnected-player', user => {
+            // if waiting modal is still on then just remove the other person's name
+            const waitingModal = document.getElementById('waiting-modal-wrapper');
+            const waitingModalStyle = window.getComputedStyle(waitingModal);
+            // if modal is up
+            if(waitingModalStyle.display !== 'none') {
+                // only leader sockets allowed
+                if(socketNum === 1 || socketNum === 3) return;
+                const defaultName = 'Waiting on another player...';
+                toggleReadyDotAndStatus('ready-dotFriend', 'lightslategray', defaultName);
+            }
+            else {  // modal is gone
+                // already got alert
+                if(homeRedirectAlert) return;
+                // only leader sockets allowed
+                if(socketNum === 1 || socketNum === 3) return;
+                // resend alert
+                // TODO: create custom alert
+                alert('Your friend has left the room. Redirecting back to the home page...');
+                window.location.href = 'http://localhost:3000';
+                homeRedirectAlert = true;
+            }
+        });
+        // #endregion
         /*
         ==================== helper functions ====================
         */
@@ -160,14 +182,14 @@ let s = sketch => {
             if(id === 'ready-dotFriend' && color === 'green') {
                 friendReady = true;
             }
-            else if(id === 'ready-dotFriend' && color === 'red') {
+            else if(id === 'ready-dotFriend' && (color === 'red' || color === 'lightslategray')) {
                 friendReady = false;
             }
             // toggle ready boolean for self
             if(id === 'ready-dotPlayer' && color === 'green') {
                 userReady = true;
             }
-            else if(id === 'ready-dotPlayer' && color === 'red') {
+            else if(id === 'ready-dotPlayer' && (color === 'red' || color === 'lightslategray')) {
                 userReady = false;
             }
         }
