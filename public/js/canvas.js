@@ -9,7 +9,12 @@ const roomId = params.room;
 document.getElementById('modal-playerName').innerHTML = userName;
 document.getElementById('room-id').innerHTML = roomId;
 
-const modalReady = document.getElementById('modal-button');
+/* 
+global variable so that both canvas can access them
+0 = first canvas
+1 = second canvas
+*/
+let activeCanvas; 
 
 let s = sketch => {
     // key codes
@@ -67,7 +72,7 @@ let s = sketch => {
         socket.on('room-full', () => {
             // TODO: change alert to custom alert
             alert(`Room ${roomId} is full! Redirecting you back to home page...`);
-            window.location.href = `http://${urlInfo.url}:${port}`;
+            window.location.href = `http://${urlInfo.url}:${urlInfoport}`;
         });
         // #endregion
         // #region 'socket-num' receive socket number
@@ -75,6 +80,8 @@ let s = sketch => {
             socketNum = Number(num);
             // only leader sockets allowed
             if(socketNum === 1 || socketNum === 3) return;
+            // set active canvas variable
+            activeCanvas = socketNum === 0 ? 0 : 1;
             // add ready button event listener since this is only called once
             document.getElementById('modal-button').addEventListener('click', () => {
                 // set our status to green
@@ -84,6 +91,8 @@ let s = sketch => {
                 // check if we are both ready
                 checkIfBothReady();
             });
+            // add developer switch button event listener
+            document.getElementById('switch-button').addEventListener('click', DEVELOPER_switchButtonHandler);
         });
         // #endregion
         // #region 'new-player' new information about new player, including self
@@ -215,6 +224,35 @@ let s = sketch => {
 
         function DEVELOPER_logSocketNumbers() {
             console.log(`socket ${socketNum}`);
+        }
+        function DEVELOPER_switchButtonHandler() {
+            const firstCanvas = document.getElementById('defaultCanvas0');
+            const secondCanvas = document.getElementById('defaultCanvas1');
+            const firstCanvasStyle = window.getComputedStyle(firstCanvas);
+            const secondCanvasStyle = window.getComputedStyle(secondCanvas);
+
+            console.log(firstCanvasStyle.display);
+            console.log(secondCanvasStyle.display); 
+
+            // swap first canvas display
+            if(firstCanvasStyle.display === 'none') {
+                document.getElementById('defaultCanvas0').style.display = 'block';
+                console.log('case 1');
+            }
+            else if(firstCanvasStyle.display === 'block') {
+                document.getElementById('defaultCanvas0').style.display = 'none';
+                console.log('case 2');
+            }
+            // swap first canvas display
+            if(secondCanvasStyle.display === 'none') {
+                document.getElementById('defaultCanvas1').style.display = 'block';
+                console.log('case 3');
+            }
+            else if(secondCanvasStyle.display === 'block') {
+                document.getElementById('defaultCanvas1').style.display = 'none';
+                console.log('case 4');
+            }
+            console.log('button presssed');
         }
         // #endregion
     }
