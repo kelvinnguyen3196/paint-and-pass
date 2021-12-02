@@ -166,7 +166,7 @@ let s = sketch => {
                 // resend alert
                 // TODO: create custom alert
                 alert('Your friend has left the room. Redirecting back to the home page...');
-                window.location.href = `http://${urlInfo.url}:${port}`;
+                window.location.href = `http://${urlInfo.url}:${urlInfo.port}`;
                 homeRedirectAlert = true;
             }
         });
