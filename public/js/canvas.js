@@ -52,11 +52,13 @@ let s = sketch => {
         // socket.io
         /*
         ==================== variables ====================
-        */ // individual variables to each socket
+        */
+        // #region individual variables to each socket
         let socketNum;
         let userReady = false;
         let friendReady = false;
         let homeRedirectAlert = false;  // prevent multiple redirect alerts
+        // #endregion
         /*
         ==================== socket.on ====================
         */
