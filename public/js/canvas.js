@@ -1,3 +1,4 @@
+import urlInfo from './linkInfo.js';
 // waiting modal scripting
 const urlSearchParams = new URLSearchParams(window.location.search);
 const params = Object.fromEntries(urlSearchParams.entries());
@@ -66,7 +67,7 @@ let s = sketch => {
         socket.on('room-full', () => {
             // TODO: change alert to custom alert
             alert(`Room ${roomId} is full! Redirecting you back to home page...`);
-            window.location.href = 'http://localhost:3000';
+            window.location.href = `http://${urlInfo.url}:${port}`;
         });
         // #endregion
         // #region 'socket-num' receive socket number
@@ -165,7 +166,7 @@ let s = sketch => {
                 // resend alert
                 // TODO: create custom alert
                 alert('Your friend has left the room. Redirecting back to the home page...');
-                window.location.href = 'http://localhost:3000';
+                window.location.href = `http://${urlInfo.url}:${port}`;
                 homeRedirectAlert = true;
             }
         });

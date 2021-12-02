@@ -1,3 +1,4 @@
+import urlInfo from './linkInfo.js';
 // fade out landing and fade in settings
 const landingWrapper = document.getElementById('landing-wrapper');
 const settingsWrapper = document.getElementById('settings-wrapper');
@@ -31,7 +32,7 @@ joinButton.addEventListener('click', () => {
         userRoom = roomIdInput;
     }
 
-    window.location.href = `http://localhost:3000/canvas?name=${userName}&room=${userRoom}`;
+    window.location.href = `http://${urlInfo.url}:${urlInfo.port}/canvas?name=${userName}&room=${userRoom}`;
 });
 
 // enter button in input text event listeners
