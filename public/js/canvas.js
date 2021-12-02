@@ -32,13 +32,20 @@ let s = sketch => {
     // is artist currently accessing tools like the slider?
     let accessingTools;
 
-    // socket.io variables
     const socket = io({
         query: {
             roomId: roomId,
             userName: userName
         }
     });
+    /*
+    ==================== variables ====================
+    */
+    // #region individual variables to each socket
+    let socketNum;
+    let userReady = false;
+    let friendReady = false;
+    let homeRedirectAlert = false;  // prevent multiple redirect alerts
     let bothReady = false;
 
     sketch.setup = () => {
@@ -56,14 +63,7 @@ let s = sketch => {
         layerManager.addLayer(new Layer(width, height, sketch), width, height, sketch, toolManager);
 
         // socket.io
-        /*
-        ==================== variables ====================
-        */
-        // #region individual variables to each socket
-        let socketNum;
-        let userReady = false;
-        let friendReady = false;
-        let homeRedirectAlert = false;  // prevent multiple redirect alerts
+        
         // #endregion
         /*
         ==================== socket.on ====================
@@ -237,22 +237,19 @@ let s = sketch => {
             // swap first canvas display
             if(firstCanvasStyle.display === 'none') {
                 document.getElementById('defaultCanvas0').style.display = 'block';
-                console.log('case 1');
+                activeCanvas = 0;
             }
             else if(firstCanvasStyle.display === 'block') {
                 document.getElementById('defaultCanvas0').style.display = 'none';
-                console.log('case 2');
             }
             // swap first canvas display
             if(secondCanvasStyle.display === 'none') {
                 document.getElementById('defaultCanvas1').style.display = 'block';
-                console.log('case 3');
+                activeCanvas = 1;
             }
             else if(secondCanvasStyle.display === 'block') {
                 document.getElementById('defaultCanvas1').style.display = 'none';
-                console.log('case 4');
             }
-            console.log('button presssed');
         }
         // #endregion
     }
@@ -267,6 +264,12 @@ let s = sketch => {
     }
 
     sketch.mouseDragged = () => {
+        // [0] only paint on first canvas, [1] with second canvas, etc
+        if(socketNum === 0 && activeCanvas === 1) return;
+        if(socketNum === 1 && activeCanvas === 0) return;
+        if(socketNum === 2 && activeCanvas === 1) return;
+        if(socketNum === 3 && activeCanvas === 0) return;
+
         if(bothReady && !accessingTools && toolManager.currentTool === 'brush-tool') {
             const currentColor = document.getElementById('color-selector').value;
             const currentRadius = document.getElementById('brush-size').value;
