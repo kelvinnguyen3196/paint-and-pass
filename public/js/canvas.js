@@ -96,7 +96,7 @@ let s = sketch => {
             toolManager = new ToolManager(layerManager, width, height, sketch, socketNum, socket);
             layerManager = new LayerManager();
             // set up first layer - we never draw on background
-            layerManager.addLayerFromMessage(new Layer(width, height, sketch), width, height, sketch, toolManager, socketNum, socket);
+            layerManager.addLayerWithoutMessage(new Layer(width, height, sketch), width, height, sketch, toolManager, socketNum, socket);
             // #endregion
             // only leader sockets allowed
             if(socketNum === 1 || socketNum === 3) return;
@@ -227,7 +227,7 @@ let s = sketch => {
         socket.on('new-layer', () => {
             console.log(`socekt ${socketNum} creating new layer...`);
             const newLayer = new Layer(width, height, sketch);
-            layerManager.addLayerFromMessage(newLayer, width, height, sketch, toolManager, socketNum, socket);
+            layerManager.addLayerWithoutMessage(newLayer, width, height, sketch, toolManager, socketNum, socket);
         });
         // #endregion
         /*

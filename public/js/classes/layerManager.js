@@ -42,7 +42,7 @@ class LayerManager {
         socket.emit('new-layer');
     }
 
-    addLayerFromMessage(layer, width, height, sketch, toolManager, socketNum, socket) {
+    addLayerWithoutMessage(layer, width, height, sketch, toolManager, socketNum, socket) {
         // determine which layer window are modifying
         const layerWindow = socketNum === 0 || socketNum === 2 ? 'layers-window' : 'layers-window2';
 
