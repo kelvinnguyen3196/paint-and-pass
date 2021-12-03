@@ -151,6 +151,22 @@ io.on('connection', socket => {
         }
     });
     // #endregion
+    // #region 'eraser-data' receive eraser data and send to correct socket
+    socket.on('eraser-data', eraserData => {
+        if(socketNum === 0) {
+            io.to(connections[room][2]['socket_id']).emit('eraser-data', eraserData);
+        }
+        else if(socketNum === 1) {
+            io.to(connections[room][3]['socket_id']).emit('eraser-data', eraserData);
+        }
+        else if(socketNum === 2) {
+            io.to(connections[room][0]['socket_id']).emit('eraser-data', eraserData);
+        }
+        else if(socketNum === 3) {
+            io.to(connections[room][1]['socket_id']).emit('eraser-data', eraserData);
+        }
+    });
+    // #endregion
     // #region 'disconnect'
     socket.on('disconnect', () => {
         // if room does not exist, then it's probably from an older connectinos

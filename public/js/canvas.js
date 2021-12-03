@@ -198,7 +198,9 @@ let s = sketch => {
             }
         });
         // #endregion
-        
+        /*
+        ==================== socket.on receive paint data ====================
+        */
         // #region 'paint-data' receive paint data and paint
         socket.on('paint-data', data => {
             // r - received
@@ -210,6 +212,20 @@ let s = sketch => {
             layerManager.paintOnLayer(sketch.color(rColor), rRadius, rMX, rMY, rWidth, sketch);
         }); 
         // #endregion 
+        // #region 'eraser-data' receive eraser data and erase
+        socket.on('eraser-data', data => {
+            // r - received
+            const rColor = data.color;
+            const rRadius = Number(data.radius);
+            const rMX = Number(data.mx);
+            const rMY = Number(data.my);
+            const rWidth = Number(data.width);
+            layerManager.paintOnLayer(rColor, rRadius, rMX, rMY, rWidth, sketch);
+        });
+        // #endregion
+        // #region 'eraser-data' receive eraser data and eraser
+        
+        // #endregion
         /*
         ==================== helper functions ====================
         */
@@ -339,6 +355,16 @@ let s = sketch => {
             const currentRadius = document.getElementById('brush-size').value;
 
             layerManager.paintOnLayer(eraserColor, Number(currentRadius) / 2, sketch.mouseX, sketch.mouseY, width, sketch);
+
+            const eraserData = {
+                color: eraserColor,
+                radius: Number(currentRadius) / 2,
+                mx: sketch.mouseX,
+                my: sketch.mouseY,
+                width: width
+            }
+
+            socket.emit('eraser-data', eraserData);
         }
     }
 
