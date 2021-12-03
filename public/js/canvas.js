@@ -198,6 +198,18 @@ let s = sketch => {
             }
         });
         // #endregion
+        
+        // #region 'paint-data' receive paint data and paint
+        socket.on('paint-data', data => {
+            // r - received
+            const rColor = data.color;
+            const rRadius = Number(data.radius);
+            const rMX = Number(data.mx);
+            const rMY = Number(data.my);
+            const rWidth = Number(data.width);
+            layerManager.paintOnLayer(sketch.color(rColor), rRadius, rMX, rMY, rWidth, sketch);
+        }); 
+        // #endregion 
         /*
         ==================== helper functions ====================
         */
@@ -311,6 +323,16 @@ let s = sketch => {
             // the algorithm behind sketch uses twice as large radius so we need
             // to divide by two to get an accurate size
             layerManager.paintOnLayer(currentColorRGBA, Number(currentRadius) / 2, sketch.mouseX, sketch.mouseY, width, sketch);
+
+            const paintData = {
+                color: 'rgba(' + r + ',' + g + ',' + b + ',' + currentOpacity + ')',
+                radius: Number(currentRadius) / 2,
+                mx: sketch.mouseX,
+                my: sketch.mouseY,
+                width: width
+            }
+
+            socket.emit('paint-data', paintData);
         }
         if(bothReady && !accessingTools && toolManager.currentTool === 'eraser-tool') {
             const eraserColor = sketch.color(0, 0);

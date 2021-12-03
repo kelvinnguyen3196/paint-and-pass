@@ -1,6 +1,5 @@
 const express = require('express');
 const http = require('http');
-const { connect } = require('http2');
 const path = require('path');
 const socketio = require('socket.io');
 
@@ -134,6 +133,22 @@ io.on('connection', socket => {
     socket.on('both-ready', () => {
         // send out message to every socket
         io.to(room).emit('both-ready');
+    });
+    // #endregion
+    // #region 'paint-data' receive paint data and send to correct socket
+    socket.on('paint-data', paintData => {
+        if(socketNum === 0) {
+            io.to(connections[room][2]['socket_id']).emit('paint-data', paintData);
+        }
+        else if(socketNum === 1) {
+            io.to(connections[room][3]['socket_id']).emit('paint-data', paintData);
+        }
+        else if(socketNum === 2) {
+            io.to(connections[room][0]['socket_id']).emit('paint-data', paintData);
+        }
+        else if(socketNum === 3) {
+            io.to(connections[room][1]['socket_id']).emit('paint-data', paintData);
+        }
     });
     // #endregion
     // #region 'disconnect'
