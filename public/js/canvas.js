@@ -93,10 +93,10 @@ let s = sketch => {
             });
             // #endregion
             // #region each socket sets up own tool and layer managers
-            toolManager = new ToolManager(layerManager, width, height, sketch, socketNum);
+            toolManager = new ToolManager(layerManager, width, height, sketch, socketNum, socket);
             layerManager = new LayerManager();
             // set up first layer - we never draw on background
-            layerManager.addLayer(new Layer(width, height, sketch), width, height, sketch, toolManager, socketNum);
+            layerManager.addLayerFromMessage(new Layer(width, height, sketch), width, height, sketch, toolManager, socketNum, socket);
             // #endregion
             // only leader sockets allowed
             if(socketNum === 1 || socketNum === 3) return;
@@ -223,6 +223,13 @@ let s = sketch => {
             layerManager.paintOnLayer(rColor, rRadius, rMX, rMY, rWidth, sketch);
         });
         // #endregion
+        // #region 'new-layer' create new later
+        socket.on('new-layer', () => {
+            console.log(`socekt ${socketNum} creating new layer...`);
+            const newLayer = new Layer(width, height, sketch);
+            layerManager.addLayerFromMessage(newLayer, width, height, sketch, toolManager, socketNum, socket);
+        });
+        // #endregion
         /*
         ==================== helper functions ====================
         */
@@ -302,7 +309,7 @@ let s = sketch => {
             if(socketNum === 2 && activeCanvas === 1) return;
             if(socketNum === 3 && activeCanvas === 0) return;
 
-            toolManager.setTool(toolManager.currentTool, layerManager, width, height, sketch, socketNum);
+            toolManager.setTool(toolManager.currentTool, layerManager, width, height, sketch, socketNum, socket);
         }
         // #endregion      
     }
@@ -376,7 +383,7 @@ let s = sketch => {
 
             console.log(`set tool handler socket: ${socketNum}`);
 
-            toolManager.setTool(this.id, layerManager, width, height, sketch, socketNum);
+            toolManager.setTool(this.id, layerManager, width, height, sketch, socketNum, socket);
         });
     });
     // #endregion
@@ -416,7 +423,7 @@ let s = sketch => {
             if(socketNum === 2 && activeCanvas === 1) return;
             if(socketNum === 3 && activeCanvas === 0) return;
 
-            toolManager.setTool(toolManager.currentTool, layerManager, width, height, sketch, socketNum);
+            toolManager.setTool(toolManager.currentTool, layerManager, width, height, sketch, socketNum, socket);
         }
         // sockets can only activate when their canvas is active
         if(socketNum === 0 && activeCanvas === 1) return;
@@ -425,13 +432,13 @@ let s = sketch => {
         if(socketNum === 3 && activeCanvas === 0) return;
 
         if(sketch.keyCode === qKey) {
-            toolManager.setTool('brush-tool', layerManager, width, height, sketch, socketNum);
+            toolManager.setTool('brush-tool', layerManager, width, height, sketch, socketNum, socket);
         }
         else if(sketch.keyCode === wKey) {
-            toolManager.setTool('eraser-tool', layerManager, width, height, sketch, socketNum);
+            toolManager.setTool('eraser-tool', layerManager, width, height, sketch, socketNum, socket);
         }
         else if(sketch.keyCode === eKey) {
-            toolManager.setTool('layer-tool', layerManager, width, height, sketch, socketNum);
+            toolManager.setTool('layer-tool', layerManager, width, height, sketch, socketNum, socket);
         }
     }
     // #endregion

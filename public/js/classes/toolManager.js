@@ -4,7 +4,7 @@ class ToolManager {
     #_toolPaths;
     #_toolColors;
 
-    constructor(layerManager, width, height, sketch, socketNum) {
+    constructor(layerManager, width, height, sketch, socketNum, socket) {
         this.#_currentTool = 'brush-tool';
         this.#_tools = ['brush-tool', 'eraser-tool', 'layer-tool'];
         this.#_toolPaths = ['brush-path', 'eraser-path', 'layer-path'];
@@ -12,10 +12,10 @@ class ToolManager {
             active: '#dd6b6f',
             inactive: '#dfe6e9'
         }
-        this.setTool(this.#_currentTool, width, height, layerManager, sketch, socketNum);
+        this.setTool(this.#_currentTool, width, height, layerManager, sketch, socketNum, socket);
     }
     // this function will be used for onclick for each of the tool icons
-    setTool(tool, layerManager, width, height, sketch, socketNum) {
+    setTool(tool, layerManager, width, height, sketch, socketNum, socket) {
         // recolor tools to active and inactive and set active tool
         for (let i = 0; i < this.#_tools.length; i++) {
             if (tool === this.#_tools[i]) {
@@ -33,14 +33,14 @@ class ToolManager {
         }
         // if layers tool click open window else close
         if (tool === 'layer-tool') {
-            this.openLayersWindow(layerManager, width, height, sketch, socketNum);
+            this.openLayersWindow(layerManager, width, height, sketch, socketNum, socket);
         }
         else {
             this.closeLayersWindow(socketNum);
         }
     }
 
-    openLayersWindow(layerManager, width, height, sketch, socketNum) {
+    openLayersWindow(layerManager, width, height, sketch, socketNum, socket) {
         const layerWindow = socketNum === 0 || socketNum === 2 ? 'layers-window' : 'layers-window2';
         // update the layers window
         const html = this.createHTMLLayersElement(layerManager);
@@ -48,7 +48,7 @@ class ToolManager {
         // color the layers accordingly
         layerManager.colorLayers(socketNum);
         // set event handlers for layer buttons
-        this.layerToolHandler(layerManager, width, height, sketch, this, socketNum);
+        this.layerToolHandler(layerManager, width, height, sketch, this, socketNum, socket);
         // activate layers window
         document.getElementById(layerWindow).style.display = 'block';
     }
@@ -74,7 +74,7 @@ class ToolManager {
         document.getElementById(layerWindow).style.display = 'none';
     }
 
-    layerToolHandler(layerManager, width, height, sketch, toolManager, socketNum) {
+    layerToolHandler(layerManager, width, height, sketch, toolManager, socketNum, socket) {
         const layerToolButtons = document.getElementsByClassName('layers-tool');
         layerToolButtons.forEach((layerTool) => {
             layerTool.addEventListener('click', function () {
@@ -83,10 +83,10 @@ class ToolManager {
                 if(idSplit[0] === 'add-layer-button') {
                     const newLayer = new Layer(width, height, sketch);
                     // layer, width, height, sketch, toolManager
-                    layerManager.addLayer(newLayer, width, height, sketch, toolManager, socketNum);
+                    layerManager.addLayer(newLayer, width, height, sketch, toolManager, socketNum, socket);
                 }
                 else if(idSplit[0] === 'layer-trash') {
-                    layerManager.deleteLayer(Number(idSplit[1]) - 1, width, height, sketch, toolManager, socketNum);
+                    layerManager.deleteLayer(Number(idSplit[1]) - 1, width, height, sketch, toolManager, socketNum, socket);
                 }
                 else if(idSplit[0] === 'layer-eye') {
                     layerManager.toggleLayer(Number(idSplit[1]) - 1, socketNum);

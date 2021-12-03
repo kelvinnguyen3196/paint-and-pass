@@ -167,6 +167,22 @@ io.on('connection', socket => {
         }
     });
     // #endregion
+    // #region 'new-layer' receive message that new layer was created
+    socket.on('new-layer', () => {
+        if(socketNum === 0) {
+            io.to(connections[room][2]['socket_id']).emit('new-layer');
+        }
+        else if(socketNum === 1) {
+            io.to(connections[room][3]['socket_id']).emit('new-layer');
+        }
+        else if(socketNum === 2) {
+            io.to(connections[room][0]['socket_id']).emit('new-layer');
+        }
+        else if(socketNum === 3) {
+            io.to(connections[room][1]['socket_id']).emit('new-layer');
+        }
+    });
+    // #endregion
     // #region 'disconnect'
     socket.on('disconnect', () => {
         // if room does not exist, then it's probably from an older connectinos

@@ -23,7 +23,7 @@ class LayerManager {
         }
     }
 
-    addLayer(layer, width, height, sketch, toolManager, socketNum) {
+    addLayer(layer, width, height, sketch, toolManager, socketNum, socket) {
         // determine which layer window are modifying
         const layerWindow = socketNum === 0 || socketNum === 2 ? 'layers-window' : 'layers-window2';
 
@@ -35,7 +35,26 @@ class LayerManager {
         const html = toolManager.createHTMLLayersElement(this);
         document.getElementById(layerWindow).innerHTML = html;
 
-        toolManager.layerToolHandler(this, width, height, sketch, toolManager, socketNum);
+        toolManager.layerToolHandler(this, width, height, sketch, toolManager, socketNum, socket);
+        this.colorLayers(socketNum);
+
+        // tell other socket we made a new later
+        socket.emit('new-layer');
+    }
+
+    addLayerFromMessage(layer, width, height, sketch, toolManager, socketNum, socket) {
+        // determine which layer window are modifying
+        const layerWindow = socketNum === 0 || socketNum === 2 ? 'layers-window' : 'layers-window2';
+
+        this.#_activeLayers.push(true);
+        this.#_layers.push(layer);
+
+        this.#_currentLayer = this.#_layers.length - 1;
+
+        const html = toolManager.createHTMLLayersElement(this);
+        document.getElementById(layerWindow).innerHTML = html;
+
+        toolManager.layerToolHandler(this, width, height, sketch, toolManager, socketNum, socket);
         this.colorLayers(socketNum);
     }
 
@@ -67,7 +86,7 @@ class LayerManager {
         }
     }
 
-    deleteLayer(layer, width, height, sketch, toolManager, socketNum) {
+    deleteLayer(layer, width, height, sketch, toolManager, socketNum, socket) {
         // determine which layer window are modifying
         const layerWindow = socketNum === 0 || socketNum === 2 ? 'layers-window' : 'layers-window2';
 
@@ -88,7 +107,7 @@ class LayerManager {
 
         document.getElementById(layerWindow).innerHTML = html;
 
-        toolManager.layerToolHandler(this, width, height, sketch, toolManager, socketNum);
+        toolManager.layerToolHandler(this, width, height, sketch, toolManager, socketNum, socket);
 
         // deleting last layer
         if(layer === 0) {
