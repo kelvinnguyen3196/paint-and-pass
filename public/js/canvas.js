@@ -234,6 +234,12 @@ let s = sketch => {
             layerManager.deleteLayerWithoutMessage(layer, width, height, sketch, toolManager, socketNum, socket);
         });
         // #endregion
+        // #region 'toggle-layer' toggle layer from message
+        socket.on('toggle-layer', layer => {
+            console.log(`toggle layer ${layer}`);
+            layerManager.toggleLayerWithoutMessage(layer, socketNum);
+        });
+        // #endregion
         /*
         ==================== helper functions ====================
         */

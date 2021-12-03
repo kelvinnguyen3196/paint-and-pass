@@ -58,7 +58,16 @@ class LayerManager {
         this.colorLayers(socketNum);
     }
 
-    toggleLayer(layer, socketNum) { // set layer as active or inactive
+    toggleLayer(layer, socketNum, socket) { // set layer as active or inactive
+        this.#_activeLayers[layer] = !this.#_activeLayers[layer];
+        // color layers accordingly
+        this.colorLayers(socketNum);
+
+        // tell other socket we toggled a layer
+        socket.emit('toggle-layer', layer);
+    }
+
+    toggleLayerWithoutMessage(layer, socketNum) { // set layer as active or inactive
         this.#_activeLayers[layer] = !this.#_activeLayers[layer];
         // color layers accordingly
         this.colorLayers(socketNum);

@@ -89,7 +89,7 @@ class ToolManager {
                     layerManager.deleteLayer(Number(idSplit[1]) - 1, width, height, sketch, toolManager, socketNum, socket);
                 }
                 else if(idSplit[0] === 'layer-eye') {
-                    layerManager.toggleLayer(Number(idSplit[1]) - 1, socketNum);
+                    layerManager.toggleLayer(Number(idSplit[1]) - 1, socketNum, socket);
                 }
             });
         });
