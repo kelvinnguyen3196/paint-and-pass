@@ -116,6 +116,7 @@ let s = sketch => {
             activeCanvas = socketNum === 0 ? 0 : 1;
             // add ready button event listener since this is only called once
             document.getElementById('modal-button').addEventListener('click', () => {
+                console.log('ready button clicked');
                 // set our status to green
                 toggleReadyDotAndStatus('ready-dotPlayer', 'green', userName);
                 // let server know we are ready
