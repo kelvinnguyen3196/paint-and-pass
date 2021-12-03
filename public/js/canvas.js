@@ -14,7 +14,9 @@ global variable so that both canvas can access them
 0 = first canvas
 1 = second canvas
 */
-let activeCanvas; 
+let activeCanvas;
+// global tool variable so that both sockets on the page can be in sync
+let playerTool = 'brush-tool';
 
 let s = sketch => {
     // key codes
@@ -181,6 +183,8 @@ let s = sketch => {
         socket.on('swap-canvas', () => {
             clearInterval(timerId);
             DEVELOPER_switchButtonHandler();
+            if(socketNum === 1 || socketNum === 3) return;
+            // only leader sockets allowed after this
             timerId = null;
             document.getElementById('time-left').innerHTML = '0:10';
             timerId = startTimer();
@@ -354,7 +358,12 @@ let s = sketch => {
             // if(socketNum === 2 && activeCanvas === 1) return;
             // if(socketNum === 3 && activeCanvas === 0) return;
 
-            toolManager.setTool('brush-tool', layerManager, width, height, sketch, socketNum, socket);
+            if(playerTool !== 'layer-tool') {
+                toolManager.setTool(playerTool, layerManager, width, height, sketch, socketNum, socket);
+            }
+            else {
+                toolManager.setTool('brush-tool', layerManager, width, height, sketch, socketNum, socket);
+            }
         }
         // #endregion      
     }
@@ -426,9 +435,8 @@ let s = sketch => {
             if(socketNum === 2 && activeCanvas === 1) return;
             if(socketNum === 3 && activeCanvas === 0) return;
 
-            console.log(`set tool handler socket: ${socketNum}`);
-
             toolManager.setTool(this.id, layerManager, width, height, sketch, socketNum, socket);
+            playerTool = this.id;
         });
     });
     // #endregion
@@ -478,12 +486,15 @@ let s = sketch => {
 
         if(sketch.keyCode === qKey) {
             toolManager.setTool('brush-tool', layerManager, width, height, sketch, socketNum, socket);
+            playerTool = 'brush-tool';
         }
         else if(sketch.keyCode === wKey) {
             toolManager.setTool('eraser-tool', layerManager, width, height, sketch, socketNum, socket);
+            playerTool = 'eraser-tool';
         }
         else if(sketch.keyCode === eKey) {
             toolManager.setTool('layer-tool', layerManager, width, height, sketch, socketNum, socket);
+            playerTool = 'layer-tool';
         }
     }
     // #endregion

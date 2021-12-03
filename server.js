@@ -137,8 +137,9 @@ io.on('connection', socket => {
     // #endregion
     // #region 'swap-canvas' socket 0 restarts the timer
     socket.on('swap-canvas', () => {
-        io.to(connections[room][0]['socket_id']).emit('swap-canvas');
-        io.to(connections[room][2]['socket_id']).emit('swap-canvas');
+        // io.to(connections[room][0]['socket_id']).emit('swap-canvas');
+        // io.to(connections[room][2]['socket_id']).emit('swap-canvas');
+        io.to(room).emit('swap-canvas');
     });
     // #endregion
     // #region 'paint-data' receive paint data and send to correct socket
