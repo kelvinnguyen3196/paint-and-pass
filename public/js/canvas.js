@@ -225,9 +225,13 @@ let s = sketch => {
         // #endregion
         // #region 'new-layer' create new later
         socket.on('new-layer', () => {
-            console.log(`socekt ${socketNum} creating new layer...`);
             const newLayer = new Layer(width, height, sketch);
             layerManager.addLayerWithoutMessage(newLayer, width, height, sketch, toolManager, socketNum, socket);
+        });
+        // #endregion
+        // #region 'delete-layer' delete layer from message
+        socket.on('delete-layer', layer => {
+            layerManager.deleteLayerWithoutMessage(layer, width, height, sketch, toolManager, socketNum, socket);
         });
         // #endregion
         /*

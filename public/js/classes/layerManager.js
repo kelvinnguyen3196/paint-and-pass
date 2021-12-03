@@ -135,6 +135,60 @@ class LayerManager {
         console.log(this.#_currentLayer);
 
         this.colorLayers(socketNum);
+
+        // tell other socket we deleted a layer
+        socket.emit('delete-layer', layer);
+    }
+
+    deleteLayerWithoutMessage(layer, width, height, sketch, toolManager, socketNum, socket) {
+        // determine which layer window are modifying
+        const layerWindow = socketNum === 0 || socketNum === 2 ? 'layers-window' : 'layers-window2';
+
+        this.#_layers.splice(layer, 1);
+        this.#_activeLayers.splice(layer, 1);
+
+        let layersHTML = [];
+        layersHTML.push(this.getLayersTitleHTML());
+        // for(let i = 0; i < layerManager.numOfLayers; i++) {
+        for (let i = this.#_layers.length; i > 0; i--) {
+            layersHTML.push(`<div id="layer_${i}" class="layer">`);
+            layersHTML.push(this.getEyeIconHTML(i));
+            layersHTML.push(`<p id="layer-name_${i}" class="layer-name">Layer ${i}</p>`);
+            layersHTML.push(this.getTrashIconHTML(i));
+            layersHTML.push('</div>');
+        }
+        const html = layersHTML.join('');
+
+        document.getElementById(layerWindow).innerHTML = html;
+
+        toolManager.layerToolHandler(this, width, height, sketch, toolManager, socketNum, socket);
+
+        // deleting last layer
+        if(layer === 0) {
+            // no layers left
+            if(this.#_layers.length === 0) {
+                this.#_currentLayer = null;
+            }
+            // there are layers
+            else {
+                // we deleted current layer
+                if(layer === this.#_currentLayer) {
+                    this.#_currentLayer = 0;
+                }
+                else {
+                    this.#_currentLayer -= 1;
+                }
+            }
+        }
+        else {
+            if(this.#_currentLayer !== 0) {
+                this.#_currentLayer -= 1;
+            }
+        }
+        
+        console.log(this.#_currentLayer);
+
+        this.colorLayers(socketNum);
     }
 
     setLayerActive(layer, socketNum) {

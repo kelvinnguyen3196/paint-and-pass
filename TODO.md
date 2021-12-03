@@ -8,6 +8,9 @@
 - [] move layers up and down with buttons
 - [] clear layer
 
+- [] compress addLayer and addLayerWithoutMessage
+- [] compress deleteLayer and deleteLayerWithoutMessage
+
 # bugs
 - [x] color selector does not work on firefox
     - update: input color window shows up in a different window and i just 
