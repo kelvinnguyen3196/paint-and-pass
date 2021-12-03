@@ -55,12 +55,6 @@ let s = sketch => {
         const currentRadius = document.getElementById('brush-size').value;
         const currentOpacity = document.getElementById('brush-opacity').value;
         toolPreviewLayer = new ToolPreview(currentRadius, currentOpacity, width, height, sketch);
-        // set up tool manager
-        toolManager = new ToolManager(layerManager, width, height, sketch);
-        // set up layer manager
-        layerManager = new LayerManager();
-        // set up first layer - we never draw on background
-        layerManager.addLayer(new Layer(width, height, sketch), width, height, sketch, toolManager);
 
         // socket.io
         
@@ -78,6 +72,13 @@ let s = sketch => {
         // #region 'socket-num' receive socket number
         socket.on('socket-num', num => {
             socketNum = Number(num);
+            // all sockets get own switch button handler
+            document.getElementById('switch-button').addEventListener('click', DEVELOPER_switchButtonHandler);
+            // each socket sets up own tool and layer managers
+            toolManager = new ToolManager(layerManager, width, height, sketch, socketNum);
+            layerManager = new LayerManager();
+            // set up first layer - we never draw on background
+            layerManager.addLayer(new Layer(width, height, sketch), width, height, sketch, toolManager, socketNum);
             // only leader sockets allowed
             if(socketNum === 1 || socketNum === 3) return;
             // set active canvas variable
@@ -91,8 +92,6 @@ let s = sketch => {
                 // check if we are both ready
                 checkIfBothReady();
             });
-            // add developer switch button event listener
-            document.getElementById('switch-button').addEventListener('click', DEVELOPER_switchButtonHandler);
         });
         // #endregion
         // #region 'new-player' new information about new player, including self
@@ -231,32 +230,42 @@ let s = sketch => {
             const firstCanvasStyle = window.getComputedStyle(firstCanvas);
             const secondCanvasStyle = window.getComputedStyle(secondCanvas);
 
-            console.log(firstCanvasStyle.display);
-            console.log(secondCanvasStyle.display); 
+            // current socket will close their layer window if open
+            toolManager.closeLayersWindow(socketNum);
 
-            // swap first canvas display
-            if(firstCanvasStyle.display === 'none') {
-                document.getElementById('defaultCanvas0').style.display = 'block';
-                activeCanvas = 0;
+            // only leader sockets swap
+            if(socketNum === 0 || socketNum === 2) {
+                // swap first canvas display
+                if(firstCanvasStyle.display === 'none') {
+                    document.getElementById('defaultCanvas0').style.display = 'block';
+                    activeCanvas = 0;
+                }
+                else if(firstCanvasStyle.display === 'block') {
+                    document.getElementById('defaultCanvas0').style.display = 'none';
+                }
+                // swap first canvas display
+                if(secondCanvasStyle.display === 'none') {
+                    document.getElementById('defaultCanvas1').style.display = 'block';
+                    activeCanvas = 1;
+                }
+                else if(secondCanvasStyle.display === 'block') {
+                    document.getElementById('defaultCanvas1').style.display = 'none';
+                }
             }
-            else if(firstCanvasStyle.display === 'block') {
-                document.getElementById('defaultCanvas0').style.display = 'none';
-            }
-            // swap first canvas display
-            if(secondCanvasStyle.display === 'none') {
-                document.getElementById('defaultCanvas1').style.display = 'block';
-                activeCanvas = 1;
-            }
-            else if(secondCanvasStyle.display === 'block') {
-                document.getElementById('defaultCanvas1').style.display = 'none';
-            }
+            // beyond here sockets act only when their canvas is active
+            if(socketNum === 0 && activeCanvas === 1) return;
+            if(socketNum === 1 && activeCanvas === 0) return;
+            if(socketNum === 2 && activeCanvas === 1) return;
+            if(socketNum === 3 && activeCanvas === 0) return;
+
+            toolManager.setTool(toolManager.currentTool, layerManager, width, height, sketch, socketNum);
         }
-        // #endregion
+        // #endregion      
     }
 
     sketch.draw = () => {
         sketch.background('#ffffff');
-
+        if(!bothReady) return;
         // render all layers
         layerManager.renderLayers(sketch);
         // tool preview should always be last line of code executed to be on top
@@ -314,20 +323,70 @@ let s = sketch => {
     const toolButtons = document.getElementsByClassName('tool');
     toolButtons.forEach((tool) => {
         tool.addEventListener('click', function() {
-            toolManager.setTool(this.id, layerManager, width, height, sketch);
+            // sockets can only activate when their canvas is active
+            if(socketNum === 0 && activeCanvas === 1) return;
+            if(socketNum === 1 && activeCanvas === 0) return;
+            if(socketNum === 2 && activeCanvas === 1) return;
+            if(socketNum === 3 && activeCanvas === 0) return;
+
+            console.log(`set tool handler socket: ${socketNum}`);
+
+            toolManager.setTool(this.id, layerManager, width, height, sketch, socketNum);
         });
     });
     // #endregion
     // #region buttons
     sketch.keyPressed = () => {
+        // don't trigger keyboard shortcuts if both players aren't ready
+        if(!bothReady) return;
+        // swap key
+        if(sketch.keyCode === rKey) {
+            const firstCanvas = document.getElementById('defaultCanvas0');
+            const secondCanvas = document.getElementById('defaultCanvas1');
+            const firstCanvasStyle = window.getComputedStyle(firstCanvas);
+            const secondCanvasStyle = window.getComputedStyle(secondCanvas);
+            // current socket will close their layer window if open
+            toolManager.closeLayersWindow(socketNum);
+            if(socketNum === 0 || socketNum === 2) {
+                // swap first canvas display
+                if(firstCanvasStyle.display === 'none') {
+                    document.getElementById('defaultCanvas0').style.display = 'block';
+                    activeCanvas = 0;
+                }
+                else if(firstCanvasStyle.display === 'block') {
+                    document.getElementById('defaultCanvas0').style.display = 'none';
+                }
+                // swap first canvas display
+                if(secondCanvasStyle.display === 'none') {
+                    document.getElementById('defaultCanvas1').style.display = 'block';
+                    activeCanvas = 1;
+                }
+                else if(secondCanvasStyle.display === 'block') {
+                    document.getElementById('defaultCanvas1').style.display = 'none';
+                }
+            }
+            // beyond here sockets act only when their canvas is active
+            if(socketNum === 0 && activeCanvas === 1) return;
+            if(socketNum === 1 && activeCanvas === 0) return;
+            if(socketNum === 2 && activeCanvas === 1) return;
+            if(socketNum === 3 && activeCanvas === 0) return;
+
+            toolManager.setTool(toolManager.currentTool, layerManager, width, height, sketch, socketNum);
+        }
+        // sockets can only activate when their canvas is active
+        if(socketNum === 0 && activeCanvas === 1) return;
+        if(socketNum === 1 && activeCanvas === 0) return;
+        if(socketNum === 2 && activeCanvas === 1) return;
+        if(socketNum === 3 && activeCanvas === 0) return;
+        console.log(`key pressed socket: ${socketNum}`);
         if(sketch.keyCode === qKey) {
-            toolManager.setTool('brush-tool', layerManager, width, height, sketch);
+            toolManager.setTool('brush-tool', layerManager, width, height, sketch, socketNum);
         }
         else if(sketch.keyCode === wKey) {
-            toolManager.setTool('eraser-tool', layerManager, width, height, sketch);
+            toolManager.setTool('eraser-tool', layerManager, width, height, sketch, socketNum);
         }
         else if(sketch.keyCode === eKey) {
-            toolManager.setTool('layer-tool', layerManager, width, height, sketch);
+            toolManager.setTool('layer-tool', layerManager, width, height, sketch, socketNum);
         }
     }
     // #endregion

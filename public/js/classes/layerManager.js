@@ -23,46 +23,54 @@ class LayerManager {
         }
     }
 
-    addLayer(layer, width, height, sketch, toolManager) {
+    addLayer(layer, width, height, sketch, toolManager, socketNum) {
+        // determine which layer window are modifying
+        const layerWindow = socketNum === 0 || socketNum === 2 ? 'layers-window' : 'layers-window2';
+
         this.#_activeLayers.push(true);
         this.#_layers.push(layer);
 
         this.#_currentLayer = this.#_layers.length - 1;
 
         const html = toolManager.createHTMLLayersElement(this);
-        document.getElementById('layers-window').innerHTML = html;
+        document.getElementById(layerWindow).innerHTML = html;
 
-        toolManager.layerToolHandler(this, width, height, sketch, toolManager);
-        this.colorLayers();
+        toolManager.layerToolHandler(this, width, height, sketch, toolManager, socketNum);
+        this.colorLayers(socketNum);
     }
 
-    toggleLayer(layer) { // set layer as active or inactive
+    toggleLayer(layer, socketNum) { // set layer as active or inactive
         this.#_activeLayers[layer] = !this.#_activeLayers[layer];
         // color layers accordingly
-        this.colorLayers();
+        this.colorLayers(socketNum);
     }
 
-    colorLayers() {
+    colorLayers(socketNum) {
+        const layerWindow = socketNum === 0 || socketNum === 2 ? 'layers-window' : 'layers-window2';
+
         for(let i = 0; i < this.#_activeLayers.length; i++) {
             if(this.#_activeLayers[i]) {
-                document.getElementById(`layer_${i + 1}`).style.backgroundColor = '#dfe6e9';
+                document.querySelector(`#${layerWindow} #layer_${i + 1}`).style.backgroundColor = '#dfe6e9';
             }
             else {
-                document.getElementById(`layer_${i + 1}`).style.backgroundColor = '#a0b3b9';
+                document.querySelector(`#${layerWindow} #layer_${i + 1}`).style.backgroundColor = '#a0b3b9';
             }
             // for active layers
             if(i === this.#_currentLayer && this.#_activeLayers[i]) {
-                document.getElementById(`layer_${i + 1}`).style.backgroundColor = '#dd6b6f';
-                document.getElementById(`layer_${i + 1}`).style.filter =  `brightness(1)`;
+                document.querySelector(`#${layerWindow} #layer_${i + 1}`).style.backgroundColor = '#dd6b6f';
+                document.querySelector(`#${layerWindow} #layer_${i + 1}`).style.filter =  `brightness(1)`;
             }
             if(i === this.#_currentLayer && !this.#_activeLayers[i]) {
-                document.getElementById(`layer_${i + 1}`).style.backgroundColor = '#dd6b6f';
-                document.getElementById(`layer_${i + 1}`).style.filter =  `brightness(0.8)`;
+                document.querySelector(`#${layerWindow} #layer_${i + 1}`).style.backgroundColor = '#dd6b6f';
+                document.querySelector(`#${layerWindow} #layer_${i + 1}`).style.filter =  `brightness(0.8)`;
             }
         }
     }
 
-    deleteLayer(layer, width, height, sketch, toolManager) {
+    deleteLayer(layer, width, height, sketch, toolManager, socketNum) {
+        // determine which layer window are modifying
+        const layerWindow = socketNum === 0 || socketNum === 2 ? 'layers-window' : 'layers-window2';
+
         this.#_layers.splice(layer, 1);
         this.#_activeLayers.splice(layer, 1);
 
@@ -78,9 +86,9 @@ class LayerManager {
         }
         const html = layersHTML.join('');
 
-        document.getElementById('layers-window').innerHTML = html;
+        document.getElementById(layerWindow).innerHTML = html;
 
-        toolManager.layerToolHandler(this, width, height, sketch, toolManager);
+        toolManager.layerToolHandler(this, width, height, sketch, toolManager, socketNum);
 
         // deleting last layer
         if(layer === 0) {
@@ -107,12 +115,12 @@ class LayerManager {
         
         console.log(this.#_currentLayer);
 
-        this.colorLayers();
+        this.colorLayers(socketNum);
     }
 
-    setLayerActive(layer) {
+    setLayerActive(layer, socketNum) {
         this.currentLayer = layer;
-        this.colorLayers();
+        this.colorLayers(socketNum);
     }
 
     getEyeIconHTML(id) {
