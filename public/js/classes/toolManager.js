@@ -72,6 +72,9 @@ class ToolManager {
     closeLayersWindow(socketNum) {
         const layerWindow = socketNum === 0 || socketNum === 2 ? 'layers-window' : 'layers-window2';
         document.getElementById(layerWindow).style.display = 'none';
+        // just close both
+        document.getElementById('layers-window').style.display = 'none';
+        document.getElementById('layers-window2').style.display = 'none';
     }
 
     layerToolHandler(layerManager, width, height, sketch, toolManager, socketNum, socket) {

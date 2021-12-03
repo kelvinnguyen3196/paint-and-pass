@@ -50,10 +50,25 @@ p {
     align-items: center;
     justify-content: flex-end;
     gap: 1rem;
-    padding-right: 1rem;
+    padding-inline: 1rem;
     height: 3.125rem;
     width: 100vw;
     background-color: var(--color-title-blue);
+}
+
+#switch-button {
+    display: none;
+}
+
+.timer-info {
+    display: flex;
+    gap: 0.5rem;
+    margin-right: auto;
+
+}
+
+.timer-info h2 {
+    color: var(--color-creamy-white);
 }
 /* tools styling */
 .tool {

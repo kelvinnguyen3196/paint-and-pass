@@ -47,6 +47,7 @@ let s = sketch => {
     let friendReady = false;
     let homeRedirectAlert = false;  // prevent multiple redirect alerts
     let bothReady = false;
+    let timerId;                    // for cancelling and restarting timer later
 
     sketch.setup = () => {
         sketch.createCanvas(width, height);
@@ -66,7 +67,7 @@ let s = sketch => {
         socket.on('room-full', () => {
             // TODO: change alert to custom alert
             alert(`Room ${roomId} is full! Redirecting you back to home page...`);
-            window.location.href = `http://${urlInfo.url}:${urlInfoport}`;
+            window.location.href = `http://${urlInfo.url}:${urlInfo.port}`;
         });
         // #endregion
         // #region 'socket-num' receive socket number
@@ -171,6 +172,18 @@ let s = sketch => {
                 document.getElementById('defaultCanvas0').style.display = 'none';
                 document.getElementById('defaultCanvas1').style.display = 'block';
             }
+            // start timer if not already started yet
+            if(timerId) return;
+            timerId = startTimer();
+        });
+        // #endregion
+        // #region 'swap-canvas' timer is up time to swap canvas
+        socket.on('swap-canvas', () => {
+            clearInterval(timerId);
+            DEVELOPER_switchButtonHandler();
+            timerId = null;
+            document.getElementById('time-left').innerHTML = '0:10';
+            timerId = startTimer();
         });
         // #endregion
         // #region 'disconnected-player' handler when friend disconencted
@@ -273,6 +286,28 @@ let s = sketch => {
                 socket.emit('both-ready');
             }
         }
+        function startTimer() {
+            const id = setInterval(() => {
+                const currentTimeLeft = document.getElementById('time-left').innerHTML;
+                const timeSplit = currentTimeLeft.split(':');
+                const secondsLeft = (Number(timeSplit[0]) * 60) + (Number(timeSplit[1]));
+                const remainingTime = secondsLeft - 1;
+                const remainingMinutes = Math.floor(remainingTime / 60);
+                const remainingSeconds = remainingTime % 60;
+                const paddedSeconds = String(remainingSeconds).padStart(2, '0');
+                const time = `${remainingMinutes}:${paddedSeconds}`;
+                document.getElementById('time-left').innerHTML = time;
+
+                if(time === '0:00') {
+                    clearInterval(timerId);
+                    timerId = null; // reset timer id
+                    if(socketNum === 0) {
+                        socket.emit('swap-canvas');
+                    }
+                }
+            }, 1000);
+            return id;
+        }
         // #endregion
         /*
         ==================== developer functions ====================
@@ -314,12 +349,12 @@ let s = sketch => {
                 }
             }
             // beyond here sockets act only when their canvas is active
-            if(socketNum === 0 && activeCanvas === 1) return;
-            if(socketNum === 1 && activeCanvas === 0) return;
-            if(socketNum === 2 && activeCanvas === 1) return;
-            if(socketNum === 3 && activeCanvas === 0) return;
+            // if(socketNum === 0 && activeCanvas === 1) return;
+            // if(socketNum === 1 && activeCanvas === 0) return;
+            // if(socketNum === 2 && activeCanvas === 1) return;
+            // if(socketNum === 3 && activeCanvas === 0) return;
 
-            toolManager.setTool(toolManager.currentTool, layerManager, width, height, sketch, socketNum, socket);
+            toolManager.setTool('brush-tool', layerManager, width, height, sketch, socketNum, socket);
         }
         // #endregion      
     }
@@ -402,39 +437,39 @@ let s = sketch => {
         // don't trigger keyboard shortcuts if both players aren't ready
         if(!bothReady) return;
         // swap key
-        if(sketch.keyCode === rKey) {
-            const firstCanvas = document.getElementById('defaultCanvas0');
-            const secondCanvas = document.getElementById('defaultCanvas1');
-            const firstCanvasStyle = window.getComputedStyle(firstCanvas);
-            const secondCanvasStyle = window.getComputedStyle(secondCanvas);
-            // current socket will close their layer window if open
-            toolManager.closeLayersWindow(socketNum);
-            if(socketNum === 0 || socketNum === 2) {
-                // swap first canvas display
-                if(firstCanvasStyle.display === 'none') {
-                    document.getElementById('defaultCanvas0').style.display = 'block';
-                    activeCanvas = 0;
-                }
-                else if(firstCanvasStyle.display === 'block') {
-                    document.getElementById('defaultCanvas0').style.display = 'none';
-                }
-                // swap first canvas display
-                if(secondCanvasStyle.display === 'none') {
-                    document.getElementById('defaultCanvas1').style.display = 'block';
-                    activeCanvas = 1;
-                }
-                else if(secondCanvasStyle.display === 'block') {
-                    document.getElementById('defaultCanvas1').style.display = 'none';
-                }
-            }
-            // beyond here sockets act only when their canvas is active
-            if(socketNum === 0 && activeCanvas === 1) return;
-            if(socketNum === 1 && activeCanvas === 0) return;
-            if(socketNum === 2 && activeCanvas === 1) return;
-            if(socketNum === 3 && activeCanvas === 0) return;
+        // if(sketch.keyCode === rKey) {
+        //     const firstCanvas = document.getElementById('defaultCanvas0');
+        //     const secondCanvas = document.getElementById('defaultCanvas1');
+        //     const firstCanvasStyle = window.getComputedStyle(firstCanvas);
+        //     const secondCanvasStyle = window.getComputedStyle(secondCanvas);
+        //     // current socket will close their layer window if open
+        //     toolManager.closeLayersWindow(socketNum);
+        //     if(socketNum === 0 || socketNum === 2) {
+        //         // swap first canvas display
+        //         if(firstCanvasStyle.display === 'none') {
+        //             document.getElementById('defaultCanvas0').style.display = 'block';
+        //             activeCanvas = 0;
+        //         }
+        //         else if(firstCanvasStyle.display === 'block') {
+        //             document.getElementById('defaultCanvas0').style.display = 'none';
+        //         }
+        //         // swap first canvas display
+        //         if(secondCanvasStyle.display === 'none') {
+        //             document.getElementById('defaultCanvas1').style.display = 'block';
+        //             activeCanvas = 1;
+        //         }
+        //         else if(secondCanvasStyle.display === 'block') {
+        //             document.getElementById('defaultCanvas1').style.display = 'none';
+        //         }
+        //     }
+        //     // beyond here sockets act only when their canvas is active
+        //     if(socketNum === 0 && activeCanvas === 1) return;
+        //     if(socketNum === 1 && activeCanvas === 0) return;
+        //     if(socketNum === 2 && activeCanvas === 1) return;
+        //     if(socketNum === 3 && activeCanvas === 0) return;
 
-            toolManager.setTool(toolManager.currentTool, layerManager, width, height, sketch, socketNum, socket);
-        }
+        //     toolManager.setTool(toolManager.currentTool, layerManager, width, height, sketch, socketNum, socket);
+        // }
         // sockets can only activate when their canvas is active
         if(socketNum === 0 && activeCanvas === 1) return;
         if(socketNum === 1 && activeCanvas === 0) return;
