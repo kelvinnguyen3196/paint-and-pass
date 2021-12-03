@@ -223,9 +223,6 @@ let s = sketch => {
             layerManager.paintOnLayer(rColor, rRadius, rMX, rMY, rWidth, sketch);
         });
         // #endregion
-        // #region 'eraser-data' receive eraser data and eraser
-        
-        // #endregion
         /*
         ==================== helper functions ====================
         */
