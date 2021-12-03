@@ -80,7 +80,6 @@ let s = sketch => {
             // #endregion
             // #region set event listeners for sliders
             document.getElementById('brush-size').addEventListener('input', () => {
-                console.log(`new brush size socket: ${socketNum}`);
                 accessingTools = true;
                 toolPreviewLayer.radius = document.getElementById('brush-size').value;
             });
@@ -253,7 +252,6 @@ let s = sketch => {
         // #endregion
         // #region 'toggle-layer' toggle layer from message
         socket.on('toggle-layer', layer => {
-            console.log(`toggle layer ${layer}`);
             layerManager.toggleLayerWithoutMessage(layer, socketNum);
         });
         // #endregion
