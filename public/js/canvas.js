@@ -72,13 +72,32 @@ let s = sketch => {
         // #region 'socket-num' receive socket number
         socket.on('socket-num', num => {
             socketNum = Number(num);
-            // all sockets get own switch button handler
+            // #region all sockets get own switch button handler
             document.getElementById('switch-button').addEventListener('click', DEVELOPER_switchButtonHandler);
-            // each socket sets up own tool and layer managers
+            // #endregion
+            // #region set event listeners for sliders
+            document.getElementById('brush-size').addEventListener('input', () => {
+                console.log(`new brush size socket: ${socketNum}`);
+                accessingTools = true;
+                toolPreviewLayer.radius = document.getElementById('brush-size').value;
+            });
+            document.getElementById('brush-size').addEventListener('mouseup', () => {
+                accessingTools = false;
+            });
+            document.getElementById('brush-opacity').addEventListener('input', () => {
+                accessingTools = true;
+                toolPreviewLayer.opacity = document.getElementById('brush-opacity').value;
+            });
+            document.getElementById('brush-opacity').addEventListener('mouseup', () => {
+                accessingTools = false;
+            });
+            // #endregion
+            // #region each socket sets up own tool and layer managers
             toolManager = new ToolManager(layerManager, width, height, sketch, socketNum);
             layerManager = new LayerManager();
             // set up first layer - we never draw on background
             layerManager.addLayer(new Layer(width, height, sketch), width, height, sketch, toolManager, socketNum);
+            // #endregion
             // only leader sockets allowed
             if(socketNum === 1 || socketNum === 3) return;
             // set active canvas variable
@@ -301,25 +320,6 @@ let s = sketch => {
         }
     }
 
-    // #region event listeners
-    document.getElementById('brush-size').oninput = () => {
-        accessingTools = true;
-        toolPreviewLayer.radius = document.getElementById('brush-size').value;
-    }
-
-    document.getElementById('brush-size').onmouseup = () => {
-        accessingTools = false;
-    }
-    
-    document.getElementById('brush-opacity').oninput = () => {
-        accessingTools = true;
-        toolPreviewLayer.opacity = document.getElementById('brush-opacity').value;
-    }
-
-    document.getElementById('brush-opacity').onmouseup = () => {
-        accessingTools = false;
-    }
-
     const toolButtons = document.getElementsByClassName('tool');
     toolButtons.forEach((tool) => {
         tool.addEventListener('click', function() {
@@ -378,7 +378,7 @@ let s = sketch => {
         if(socketNum === 1 && activeCanvas === 0) return;
         if(socketNum === 2 && activeCanvas === 1) return;
         if(socketNum === 3 && activeCanvas === 0) return;
-        console.log(`key pressed socket: ${socketNum}`);
+
         if(sketch.keyCode === qKey) {
             toolManager.setTool('brush-tool', layerManager, width, height, sketch, socketNum);
         }
