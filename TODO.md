@@ -20,6 +20,7 @@
     - remove the listener once it is clicked
 - [] if both players are in room when first player leaves and rejoins they don't 
 know of the other player
+- [] mobile players have problems with screen moving
 
 # socket.io post handshake
 ## current
