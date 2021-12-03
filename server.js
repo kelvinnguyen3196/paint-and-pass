@@ -135,6 +135,12 @@ io.on('connection', socket => {
         io.to(room).emit('both-ready');
     });
     // #endregion
+    // #region 'set-swap-time' let socket 2 know of time
+    socket.on('set-swap-time', time => {
+        // only leader sockets get to know
+        io.to(connections[room][0]['socket_id']).emit('set-swap-time', time);
+        io.to(connections[room][2]['socket_id']).emit('set-swap-time', time);
+    });
     // #region 'swap-canvas' socket 0 restarts the timer
     socket.on('swap-canvas', () => {
         // io.to(connections[room][0]['socket_id']).emit('swap-canvas');

@@ -8,6 +8,10 @@ const roomId = params.room;
 
 document.getElementById('modal-playerName').innerHTML = userName;
 document.getElementById('room-id').innerHTML = roomId;
+// only allow numbers in time box
+document.getElementById('overwritten-time').onkeydown = (event) => {
+    return event.keyCode === 8 || event.keyCode === 46 && event.keyCode !== 32 ? true : !isNaN(Number(event.key));
+}
 
 /* 
 global variable so that both canvas can access them
@@ -17,6 +21,7 @@ global variable so that both canvas can access them
 let activeCanvas;
 // global tool variable so that both sockets on the page can be in sync
 let playerTool = 'brush-tool';
+let overwrittenTime = '5';
 
 let s = sketch => {
     // key codes
@@ -50,6 +55,7 @@ let s = sketch => {
     let homeRedirectAlert = false;  // prevent multiple redirect alerts
     let bothReady = false;
     let timerId;                    // for cancelling and restarting timer later
+    let setSwapTime = false;
 
     sketch.setup = () => {
         sketch.createCanvas(width, height);
@@ -75,6 +81,10 @@ let s = sketch => {
         // #region 'socket-num' receive socket number
         socket.on('socket-num', num => {
             socketNum = Number(num);
+            // hide time picker from second player
+            if(socketNum === 2) {
+                document.getElementById('overwritten-time').style.display = 'none';
+            }
             // #region all sockets get own switch button handler
             document.getElementById('switch-button').addEventListener('click', DEVELOPER_switchButtonHandler);
             // #endregion
@@ -173,9 +183,26 @@ let s = sketch => {
                 document.getElementById('defaultCanvas0').style.display = 'none';
                 document.getElementById('defaultCanvas1').style.display = 'block';
             }
+            if(socketNum === 0 && !setSwapTime) {
+                setSwapTime = true;
+                let swapTime;
+                if(document.getElementById('overwritten-time').value.length === 0) {
+                    swapTime = '5';
+                }
+                else {
+                    swapTime = document.getElementById('overwritten-time').value;
+                }
+                socket.emit('set-swap-time', swapTime);
+            }
             // start timer if not already started yet
             if(timerId) return;
             timerId = startTimer();
+        });
+        // #endregion
+        // #region 'set-swap-time' 
+        socket.on('set-swap-time', time => {
+            overwrittenTime = time;
+            document.getElementById('time-left').innerHTML = `${overwrittenTime}:00`;
         });
         // #endregion
         // #region 'swap-canvas' timer is up time to swap canvas
@@ -185,7 +212,7 @@ let s = sketch => {
             if(socketNum === 1 || socketNum === 3) return;
             // only leader sockets allowed after this
             timerId = null;
-            document.getElementById('time-left').innerHTML = '0:10';
+            document.getElementById('time-left').innerHTML = `${overwrittenTime}:00`;
             timerId = startTimer();
         });
         // #endregion

@@ -39,6 +39,22 @@ p {
     font-size: 1.3rem;
     margin-block: 1rem;
 }
+
+h1, h2 {
+    margin-block: 0;
+}
+
+h1 {
+    font-family: 'Monoton';
+    color: var(--color-cloud-orange);
+    font-size: 50px;
+}
+
+h2 {
+    font-family: 'Rubik Regular';
+    color: var(--color-title-blue);
+    font-size: 30px;
+}
 /* top bar styling */
 .top-bar-container {
     height: 3.125rem;
@@ -261,27 +277,12 @@ input[type="range"]::-moz-range-track {
     padding: 1rem 2rem;
     display: flex;
     flex-direction: column;
+
 }
 
 .modal-room-id {
     display: flex;
     gap: 1ch;
-}
-
-h1, h2 {
-    margin-block: 0;
-}
-
-h1 {
-    font-family: 'Monoton';
-    color: var(--color-cloud-orange);
-    font-size: 50px;
-}
-
-h2 {
-    font-family: 'Rubik Regular';
-    color: var(--color-title-blue);
-    font-size: 30px;
 }
 
 .modal-player-info {
@@ -310,16 +311,27 @@ h2 {
     flex-shrink: 0;
 }
 
-.ready-dot.red {
-    background-color: red;;
+.modal-description {
+    font-size: 23px;
 }
 
-.ready-dot.green {
-    background-color: green;
+.modal-footer {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
-.ready-dot.gray {
-    background-color: lightslategray;
+#overwritten-time {
+    height: 4rem;
+    width: 10rem;
+    font-size: 1.53rem;
+    padding: 0.3rem 0.5rem;
+    border: 3px solid var(--color-title-blue);
+    border-radius: 10px;
+}
+
+#overwritten-time:focus, #overwritten-time:active {
+    outline: none;
 }
 
 h3 {
@@ -338,10 +350,14 @@ h3 {
 
 .button {
     background: var(--color-title-blue);
-    width: fit-content;
+    width: 10rem;
+    height: 4rem;
     padding: 1rem 2rem;
     border-radius: 1rem;
     position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .button:hover {

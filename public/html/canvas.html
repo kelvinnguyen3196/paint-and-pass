@@ -21,9 +21,9 @@
             <h1>Paint and Pass</h1>
             <div class="modal-room-id">
                 <h2>Room ID:</h2>
-                <h2 id="room-id">5592</h2>
+                <h2 id="room-id"></h2>
             </div>
-            <h2>Please wait until all players are ready...</h2>
+            <h2 class="modal-description">The default time for canvases to be switched with the other player is five minutes. Player one can override the swap time.</h2>
             
             <div class="modal-player-info">
                 <div class="modal-player-row">
@@ -36,9 +36,14 @@
                 </div>
             </div>
 
-            <div id="modal-button" class="button">
-                <h3 class="button-text">Ready</h3>
+            <div class="modal-footer">
+                <div id="modal-button" class="button">
+                    <h3 class="button-text">Ready</h3>
+                </div>
+    
+                <input type="number" id="overwritten-time" placeholder="5" min="1" max="20">
             </div>
+
         </div>
     </div>
 
@@ -46,7 +51,7 @@
         <div class="top-bar">
             <div class="timer-info">
                 <h2>Pass in: </h2>
-                <h2 id="time-left">0:10</h2>
+                <h2 id="time-left">5:00</h2>
             </div>
             <button id="switch-button">Switch</button>
             <svg id="brush-tool" class="tool" viewBox="0 0 24 24" fill="none">
