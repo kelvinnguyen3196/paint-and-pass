@@ -151,15 +151,19 @@ io.on('connection', socket => {
     // #region 'paint-data' receive paint data and send to correct socket
     socket.on('paint-data', paintData => {
         if(socketNum === 0) {
+            if(!connections[room][2]) return;
             io.to(connections[room][2]['socket_id']).emit('paint-data', paintData);
         }
         else if(socketNum === 1) {
+            if(!connections[room][3]) return;
             io.to(connections[room][3]['socket_id']).emit('paint-data', paintData);
         }
         else if(socketNum === 2) {
+            if(!connections[room][0]) return;
             io.to(connections[room][0]['socket_id']).emit('paint-data', paintData);
         }
         else if(socketNum === 3) {
+            if(!connections[room][1]) return;
             io.to(connections[room][1]['socket_id']).emit('paint-data', paintData);
         }
     });

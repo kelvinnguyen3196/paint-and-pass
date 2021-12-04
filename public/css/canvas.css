@@ -270,8 +270,8 @@ input[type="range"]::-moz-range-track {
 }
 
 .waiting-modal-box {
-    height: 50vh;
-    width: 50vw;
+    height: 60vh;
+    width: 60vw;
     background-color: var(--color-creamy-white);
     border-radius: 15px;
     background-image: url('../assets/images/low_opacity_clouds.png');
@@ -280,11 +280,12 @@ input[type="range"]::-moz-range-track {
     padding: 1rem 2rem;
     display: flex;
     flex-direction: column;
-
+    gap: 1rem;
 }
 
 .modal-room-id {
     display: flex;
+    align-items: center;
     gap: 1ch;
 }
 
@@ -383,4 +384,41 @@ h3 {
     -moz-user-select: none;     /* Firefox */ 
     -ms-user-select: none;      /* IE10+/Edge */
     user-select: none;          /* Standard */
+}
+
+@media screen and (max-width: 1370px) {
+
+}
+
+@media screen and (max-width: 1100px) {
+    .waiting-modal-box {
+        width: 70vw;
+    }
+}
+
+@media screen and (max-width: 800px) {
+    .waiting-modal-box {
+        width: 70vw;
+        height: 80vh;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    h1 {
+        font-size: 40px;
+        line-height: 40px;
+    }
+
+    .modal-description {
+        font-size: 20px;
+    }
+
+    .modal-name {
+        font-size: 25px;
+    }
+    
+    .waiting-modal-box {
+        width: 90vw;
+        height: 90vh;
+    }
 }

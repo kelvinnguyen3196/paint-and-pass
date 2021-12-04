@@ -58,6 +58,15 @@ let s = sketch => {
     let setSwapTime = false;
 
     sketch.setup = () => {
+        document.getElementById('modal-button').addEventListener('click', () => {
+            console.log('ready button clicked');
+            // set our status to green
+            toggleReadyDotAndStatus('ready-dotPlayer', 'green', userName);
+            // let server know we are ready
+            socket.emit('player-ready');
+            // check if we are both ready
+            checkIfBothReady();
+        });
         sketch.createCanvas(width, height);
         // not accessing tools at the start 
         // set up tool preview i.e. brush size slider
@@ -82,7 +91,9 @@ let s = sketch => {
         socket.on('socket-num', num => {
             socketNum = Number(num);
             // hide time picker from second player
-            if(socketNum === 2) {
+            console.log(socketNum);
+            if(socketNum === 2 || socketNum === 3) {
+                console.log('hiding time...');
                 document.getElementById('overwritten-time').style.display = 'none';
             }
             // #region all sockets get own switch button handler
@@ -104,6 +115,24 @@ let s = sketch => {
                 accessingTools = false;
             });
             // #endregion
+            // #region mobile event listeners for sliders
+            document.getElementById('switch-button').addEventListener('click', DEVELOPER_switchButtonHandler);
+            // #endregion
+            // #region set event listeners for sliders
+            document.getElementById('brush-size').addEventListener('touchstart', () => {
+                accessingTools = true;
+                toolPreviewLayer.radius = document.getElementById('brush-size').value;
+            });
+            document.getElementById('brush-size').addEventListener('touchend', () => {
+                accessingTools = false;
+            });
+            document.getElementById('brush-opacity').addEventListener('touchstart', () => {
+                accessingTools = true;
+                toolPreviewLayer.opacity = document.getElementById('brush-opacity').value;
+            });
+            document.getElementById('brush-opacity').addEventListener('touchend', () => {
+                accessingTools = false;
+            });
             // #region each socket sets up own tool and layer managers
             toolManager = new ToolManager(layerManager, width, height, sketch, socketNum, socket);
             layerManager = new LayerManager();
@@ -115,15 +144,6 @@ let s = sketch => {
             // set active canvas variable
             activeCanvas = socketNum === 0 ? 0 : 1;
             // add ready button event listener since this is only called once
-            document.getElementById('modal-button').addEventListener('click', () => {
-                console.log('ready button clicked');
-                // set our status to green
-                toggleReadyDotAndStatus('ready-dotPlayer', 'green', userName);
-                // let server know we are ready
-                socket.emit('player-ready');
-                // check if we are both ready
-                checkIfBothReady();
-            });
         });
         // #endregion
         // #region 'new-player' new information about new player, including self
@@ -179,10 +199,12 @@ let s = sketch => {
             if(socketNum === 0) {   // p0 turns off second canvas
                 document.getElementById('defaultCanvas0').style.display = 'block';
                 document.getElementById('defaultCanvas1').style.display = 'none';
+                console.log('turned off second canvas');
             }
             else if(socketNum === 2) {  // p1 turns off first canvas
                 document.getElementById('defaultCanvas0').style.display = 'none';
                 document.getElementById('defaultCanvas1').style.display = 'block';
+                console.log('turned off first canvas');
             }
             if(socketNum === 0 && !setSwapTime) {
                 setSwapTime = true;
