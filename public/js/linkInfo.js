@@ -1,5 +1,5 @@
 const url = 'http://www.paintandpass.com';
-const port = '3000';
+const port = process.env.PORT || 80;
 
 export default {
     url,
