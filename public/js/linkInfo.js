@@ -1,4 +1,4 @@
-const url = '10.0.0.98';
+const url = 'http://www.paintandpass.com';
 const port = '3000';
 
 export default {
