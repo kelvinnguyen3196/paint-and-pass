@@ -18,9 +18,14 @@
 - [] change size on canvas on window resize?
 - [] get started button on landing page can be clicked multiple times and mess up the page
     - remove the listener once it is clicked
-- [] if both players are in room when first player leaves and rejoins they don't 
+- [x] if both players are in room when first player leaves and rejoins they don't 
 know of the other player
-- [] mobile players have problems with screen moving
+- [x] mobile players have problems with screen moving
+- [x] sometimes clients do not receive socket number even though it was sent out. this causes all sorts of problems with uninitialized variables
+    - solution is to have server continually send out socket number with set interval until the client responds that it has received their socket number
+    - once the client has recieved their socket number, the ready button should go from visibility hidden to visibilty visible
+- [] has not occurred yet, but if selecting a layer message gets lost then paint would look different to each player
+- [] add automatic disconnect after certain amount of time if inactive
 
 # socket.io post handshake
 ## current

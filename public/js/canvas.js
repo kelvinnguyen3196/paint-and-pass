@@ -23,6 +23,8 @@ let activeCanvas;
 // global tool variable so that both sockets on the page can be in sync
 let playerTool = 'brush-tool';
 let overwrittenTime = '5';
+let firstSocketReady = false;
+let secondSocketReady = false;
 
 let s = sketch => {
     // key codes
@@ -61,15 +63,6 @@ let s = sketch => {
     let setSwapTime = false;
 
     sketch.setup = () => {
-        document.getElementById('modal-button').addEventListener('click', () => {
-            console.log('ready button clicked');
-            // set our status to green
-            toggleReadyDotAndStatus('ready-dotPlayer', 'green', userName);
-            // let server know we are ready
-            socket.emit('player-ready');
-            // check if we are both ready
-            checkIfBothReady();
-        });
         sketch.createCanvas(width, height);
         // not accessing tools at the start 
         // set up tool preview i.e. brush size slider
@@ -93,16 +86,23 @@ let s = sketch => {
         // #region 'socket-num' receive socket number
         socket.on('socket-num', num => {
             socketNum = Number(num);
+            console.log(`Socket ${num} received socket number`);
+            // assign global variable so other socket can know ready status
+            if(socketNum === 0 || socketNum === 2) {
+                firstSocketReady = true;
+            }
+            else if(socketNum === 1 || socketNum === 3) {
+                secondSocketReady = true;
+            }
             // hide time picker from second player
-            console.log(socketNum);
             if(socketNum === 2 || socketNum === 3) {
                 console.log('hiding time...');
                 document.getElementById('overwritten-time').style.display = 'none';
             }
             document.getElementById('overwritten-time').addEventListener('change', () => {
                 document.getElementById('time-left').innerHTML = document.getElementById('overwritten-time').value + ':00';
-                socket.emit('set-swap-time', document.getElementById('overwritten-time').value);
                 overwrittenTime = document.getElementById('overwritten-time').value;
+                socket.emit('set-swap-time', overwrittenTime);
             });
             // #region all sockets get own switch button handler
             document.getElementById('switch-button').addEventListener('click', DEVELOPER_switchButtonHandler);
@@ -141,17 +141,33 @@ let s = sketch => {
             document.getElementById('brush-opacity').addEventListener('touchend', () => {
                 accessingTools = false;
             });
+            // #endregion
             // #region each socket sets up own tool and layer managers
             toolManager = new ToolManager(layerManager, width, height, sketch, socketNum, socket);
             layerManager = new LayerManager();
             // set up first layer - we never draw on background
             layerManager.addLayerWithoutMessage(new Layer(width, height, sketch), width, height, sketch, toolManager, socketNum, socket);
             // #endregion
+            // let server know that we received our socket number and set everything up just fine
+            socket.emit('confirm-socket-num');
+            // if both sockets are ready allow ready button to be pressed
+            if(firstSocketReady && secondSocketReady) {
+                document.getElementById('modal-button').style.visibility = 'visible';
+            }
             // only leader sockets allowed
             if(socketNum === 1 || socketNum === 3) return;
             // set active canvas variable
             activeCanvas = socketNum === 0 ? 0 : 1;
             // add ready button event listener since this is only called once
+            document.getElementById('modal-button').addEventListener('click', () => {
+                console.log('ready button clicked');
+                // set our status to green
+                toggleReadyDotAndStatus('ready-dotPlayer', 'green', userName);
+                // let server know we are ready
+                socket.emit('player-ready');
+                // check if we are both ready
+                checkIfBothReady();
+            });
         });
         // #endregion
         // #region 'new-player' new information about new player, including self
@@ -167,6 +183,11 @@ let s = sketch => {
             }
             // once we are checked in ask server about other players info
             socket.emit('check-players');
+            // only socket 0 sets overwritten time to be visible once both players are in
+            if(socketNum !== 0) return;
+            // don't set if the new player is player one
+            if(user === userName && !friendReady) return;
+            document.getElementById('overwritten-time').style.visibility = 'visible';
         });
         // #endregion
         // #region 'check-players' receive info about other players in room
@@ -177,7 +198,8 @@ let s = sketch => {
             // new player from 'new-player'
             let otherPlayer;
             if(players['firstPlayer']['name'] === userName) {
-                return;
+                // return;
+                otherPlayer = players['secondPlayer'];
             }
             else {  // case where are are the second player and we arrived later
                 otherPlayer = players['firstPlayer'];
@@ -185,7 +207,10 @@ let s = sketch => {
             // set friend color
             const friendStatusColor = otherPlayer['ready'] ? 'green' : 'red';
             toggleReadyDotAndStatus('ready-dotFriend', friendStatusColor, otherPlayer['name']);
-            socket.emit('set-swap-time', overwrittenTime);
+            // socket.emit('set-swap-time', overwrittenTime);
+            // on player one rejoin make overwritten time visible
+            if(socketNum === 2) return;
+            document.getElementById('overwritten-time').style.visibility = 'visible';
         });
         // #endregion
         // #region 'friend-ready' we now know friend is ready
@@ -234,7 +259,6 @@ let s = sketch => {
         // #region 'set-swap-time' 
         socket.on('set-swap-time', time => {
             overwrittenTime = time;
-            console.log(overwrittenTime);
             document.getElementById('time-left').innerHTML = `${overwrittenTime}:00`;
         });
         // #endregion
@@ -260,6 +284,10 @@ let s = sketch => {
                 if(socketNum === 1 || socketNum === 3) return;
                 const defaultName = 'Waiting on another player...';
                 toggleReadyDotAndStatus('ready-dotFriend', 'lightslategray', defaultName);
+                // reset overwritten time
+                document.getElementById('overwritten-time').value = '';
+                document.getElementById('overwritten-time').style.visibility = 'hidden';
+                document.getElementById('time-left').innerHTML = '5:00';
             }
             else {  // modal is gone
                 // already got alert
@@ -272,6 +300,9 @@ let s = sketch => {
                 window.location.href = `http://${urlInfo.url}:${urlInfo.port}`;
                 homeRedirectAlert = true;
             }
+            // friend is unready if there is no friend
+            friendReady = false;
+            bothReady = false;
         });
         // #endregion
         /*
@@ -336,6 +367,7 @@ let s = sketch => {
             }
             else if(id === 'ready-dotFriend' && (color === 'red' || color === 'lightslategray')) {
                 friendReady = false;
+                bothReady = false;
             }
             // toggle ready boolean for self
             if(id === 'ready-dotPlayer' && color === 'green') {
@@ -343,6 +375,7 @@ let s = sketch => {
             }
             else if(id === 'ready-dotPlayer' && (color === 'red' || color === 'lightslategray')) {
                 userReady = false;
+                bothReady = false;
             }
         }
         // make sure to only have sockets 0 and 2 call this function
