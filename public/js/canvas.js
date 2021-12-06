@@ -13,6 +13,7 @@ document.getElementById('overwritten-time').onkeydown = (event) => {
     return event.keyCode === 8 || event.keyCode === 46 && event.keyCode !== 32 ? true : !isNaN(Number(event.key));
 }
 
+
 /* 
 global variable so that both canvas can access them
 0 = first canvas
@@ -45,6 +46,8 @@ let s = sketch => {
             userName: userName
         }
     });
+
+    
     /*
     ==================== variables ====================
     */
@@ -96,6 +99,11 @@ let s = sketch => {
                 console.log('hiding time...');
                 document.getElementById('overwritten-time').style.display = 'none';
             }
+            document.getElementById('overwritten-time').addEventListener('change', () => {
+                document.getElementById('time-left').innerHTML = document.getElementById('overwritten-time').value + ':00';
+                socket.emit('set-swap-time', document.getElementById('overwritten-time').value);
+                overwrittenTime = document.getElementById('overwritten-time').value;
+            });
             // #region all sockets get own switch button handler
             document.getElementById('switch-button').addEventListener('click', DEVELOPER_switchButtonHandler);
             // #endregion
@@ -206,17 +214,17 @@ let s = sketch => {
                 document.getElementById('defaultCanvas1').style.display = 'block';
                 console.log('turned off first canvas');
             }
-            if(socketNum === 0 && !setSwapTime) {
-                setSwapTime = true;
-                let swapTime;
-                if(document.getElementById('overwritten-time').value.length === 0) {
-                    swapTime = '5';
-                }
-                else {
-                    swapTime = document.getElementById('overwritten-time').value;
-                }
-                socket.emit('set-swap-time', swapTime);
-            }
+            // if(socketNum === 0 && !setSwapTime) {
+            //     setSwapTime = true;
+            //     let swapTime;
+            //     if(document.getElementById('overwritten-time').value.length === 0) {
+            //         swapTime = '5';
+            //     }
+            //     else {
+            //         swapTime = document.getElementById('overwritten-time').value;
+            //     }
+            //     socket.emit('set-swap-time', swapTime);
+            // }
             // start timer if not already started yet
             if(timerId) return;
             timerId = startTimer();
@@ -225,6 +233,7 @@ let s = sketch => {
         // #region 'set-swap-time' 
         socket.on('set-swap-time', time => {
             overwrittenTime = time;
+            console.log(overwrittenTime);
             document.getElementById('time-left').innerHTML = `${overwrittenTime}:00`;
         });
         // #endregion
@@ -303,6 +312,11 @@ let s = sketch => {
         // #region 'toggle-layer' toggle layer from message
         socket.on('toggle-layer', layer => {
             layerManager.toggleLayerWithoutMessage(layer, socketNum);
+        });
+        // #endregion
+        // #region 'set-layer' select correct layer
+        socket.on('set-layer', layer => {
+            layerManager.setLayerActiveWithoutMessage(layer, socketNum, socket);
         });
         // #endregion
         /*

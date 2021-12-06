@@ -232,6 +232,22 @@ io.on('connection', socket => {
         }
     });
     // #endregion
+    // #region 'set-layer'
+    socket.on('set-layer', layer => {
+        if(socketNum === 0) {
+            io.to(connections[room][2]['socket_id']).emit('set-layer', layer);
+        }
+        else if(socketNum === 1) {
+            io.to(connections[room][3]['socket_id']).emit('set-layer', layer);
+        }
+        else if(socketNum === 2) {
+            io.to(connections[room][0]['socket_id']).emit('set-layer', layer);
+        }
+        else if(socketNum === 3) {
+            io.to(connections[room][1]['socket_id']).emit('set-layer', layer);
+        }
+    });
+    // #endregion
     // #region 'disconnect'
     socket.on('disconnect', () => {
         // if room does not exist, then it's probably from an older connectinos

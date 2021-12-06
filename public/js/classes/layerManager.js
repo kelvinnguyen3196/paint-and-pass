@@ -200,7 +200,13 @@ class LayerManager {
         this.colorLayers(socketNum);
     }
 
-    setLayerActive(layer, socketNum) {
+    setLayerActive(layer, socketNum, socket) {
+        this.currentLayer = layer;
+        this.colorLayers(socketNum);
+        socket.emit('set-layer', layer);
+    }
+
+    setLayerActiveWithoutMessage(layer, socketNum, socket) {
         this.currentLayer = layer;
         this.colorLayers(socketNum);
     }
