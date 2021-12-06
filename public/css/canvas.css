@@ -336,6 +336,7 @@ input[type="range"]::-moz-range-track {
     padding: 0.3rem 0.5rem;
     border: 3px solid var(--color-title-blue);
     border-radius: 10px;
+    visibility: hidden;
 }
 
 #overwritten-time:focus, #overwritten-time:active {
