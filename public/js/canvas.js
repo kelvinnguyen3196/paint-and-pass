@@ -205,6 +205,8 @@ let s = sketch => {
                 otherPlayer = players['firstPlayer'];
             }
             // set friend color
+            // if we are first player and no one else here, return
+            if(otherPlayer === null) return;
             const friendStatusColor = otherPlayer['ready'] ? 'green' : 'red';
             toggleReadyDotAndStatus('ready-dotFriend', friendStatusColor, otherPlayer['name']);
             // socket.emit('set-swap-time', overwrittenTime);
