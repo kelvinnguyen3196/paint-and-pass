@@ -138,7 +138,9 @@ io.on('connection', socket => {
     // #region 'set-swap-time' let socket 2 know of time
     socket.on('set-swap-time', time => {
         // only leader sockets get to know
+        if(connections[room][0] === null) return;
         io.to(connections[room][0]['socket_id']).emit('set-swap-time', time);
+        if(connections[room][2] === null) return;
         io.to(connections[room][2]['socket_id']).emit('set-swap-time', time);
     });
     // #region 'swap-canvas' socket 0 restarts the timer
