@@ -325,6 +325,10 @@ input[type="range"]::-moz-range-track {
     gap: 1rem;
 }
 
+#modal-button {
+    visibility: hidden;
+}
+
 #overwritten-time {
     height: 4rem;
     width: 10rem;

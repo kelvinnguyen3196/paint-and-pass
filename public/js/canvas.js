@@ -23,6 +23,8 @@ let activeCanvas;
 // global tool variable so that both sockets on the page can be in sync
 let playerTool = 'brush-tool';
 let overwrittenTime = '5';
+let firstSocketReady = false;
+let secondSocketReady = false;
 
 let s = sketch => {
     // key codes
@@ -93,8 +95,15 @@ let s = sketch => {
         // #region 'socket-num' receive socket number
         socket.on('socket-num', num => {
             socketNum = Number(num);
+            console.log(`Socket ${num} received socket number`);
+            // assign global variable so other socket can know ready status
+            if(socketNum === 0 || socketNum === 2) {
+                firstSocketReady = true;
+            }
+            else if(socketNum === 1 || socketNum === 3) {
+                secondSocketReady = true;
+            }
             // hide time picker from second player
-            console.log(socketNum);
             if(socketNum === 2 || socketNum === 3) {
                 console.log('hiding time...');
                 document.getElementById('overwritten-time').style.display = 'none';
@@ -148,6 +157,12 @@ let s = sketch => {
             // set up first layer - we never draw on background
             layerManager.addLayerWithoutMessage(new Layer(width, height, sketch), width, height, sketch, toolManager, socketNum, socket);
             // #endregion
+            // let server know that we received our socket number and set everything up just fine
+            socket.emit('confirm-socket-num');
+            // if both sockets are ready allow ready button to be pressed
+            if(firstSocketReady && secondSocketReady) {
+                document.getElementById('modal-button').style.visibility = 'visible';
+            }
             // only leader sockets allowed
             if(socketNum === 1 || socketNum === 3) return;
             // set active canvas variable

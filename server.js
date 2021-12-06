@@ -24,15 +24,17 @@ app.get('/canvas', (req, res) => {
 - new names are put into element 0 and 2 in [room_id]
     - this allows for connections to happen at any time
 
-    [room_id]: [ { socket_id: _, name: _, ready: _ }, ... ]
+    [room_id]: [ { socket_id: _, name: _, ready: _, confirmed: _ }, ... ]
     ...
-    [room_id]: [ { socket_id: _, name: _, ready: _ }, ... ]
+    [room_id]: [ { socket_id: _, name: _, ready: _, confirmed: _ }, ... ]
 */
 const connections = {};
 io.on('connection', socket => {
     // #region introductory connection set up
     let room = socket.handshake.query.roomId;
     let userName = socket.handshake.query.userName;
+    let confirmed = false;
+    let resendTimer;
     // if room does not exist, create new room
     if(!connections[room]) {
         connections[room] = [null, null, null, null];
@@ -93,6 +95,14 @@ io.on('connection', socket => {
         }
     }
     socket.join(room);
+    resendTimer = setInterval(() => {
+        if(confirmed) { // stop this interval once confirmed is true
+            clearInterval(resendTimer);
+            return;
+        }
+        console.log(`Resending socket number to ${socketNum}...`);
+        socket.emit('socket-num', socketNum);
+    }, 1000);
     // TODO: add socket id and userName as an object so the main socket only does
         // TODO: things once
     io.to(room).emit('new-player', userName);
@@ -126,6 +136,11 @@ io.on('connection', socket => {
         }
         // send out which player is ready to other player
         io.to(room).emit('friend-ready', userName);
+    });
+    // #endregion
+    // #region
+    socket.on('confirm-socket-num', () => {
+        confirmed = true;
     });
     // #endregion
     // #region 'both-ready' both are ready - sent bothReady = true for ALL sockets
