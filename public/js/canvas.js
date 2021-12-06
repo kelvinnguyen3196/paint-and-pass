@@ -314,6 +314,11 @@ let s = sketch => {
             layerManager.toggleLayerWithoutMessage(layer, socketNum);
         });
         // #endregion
+        // #region 'set-layer' select correct layer
+        socket.on('set-layer', layer => {
+            layerManager.setLayerActiveWithoutMessage(layer, socketNum, socket);
+        });
+        // #endregion
         /*
         ==================== helper functions ====================
         */

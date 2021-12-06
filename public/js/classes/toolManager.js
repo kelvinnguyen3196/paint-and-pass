@@ -101,7 +101,7 @@ class ToolManager {
         layerSections.forEach((section) => {
             section.addEventListener('click', function() {
                 const idSplit = this.id.split('_');
-                layerManager.setLayerActive(Number(idSplit[1]) - 1, socketNum);
+                layerManager.setLayerActive(Number(idSplit[1]) - 1, socketNum, socket);
             });
         });
     }
