@@ -84,7 +84,6 @@ io.on('connection', socket => {
             connections[room][0] = newSocket;
             socketNum = 0;
             socket.emit('socket-num', socketNum);
-
         }
         else {
             connections[room][2] = newSocket;

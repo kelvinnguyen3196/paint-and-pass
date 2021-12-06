@@ -141,6 +141,7 @@ let s = sketch => {
             document.getElementById('brush-opacity').addEventListener('touchend', () => {
                 accessingTools = false;
             });
+            // #endregion
             // #region each socket sets up own tool and layer managers
             toolManager = new ToolManager(layerManager, width, height, sketch, socketNum, socket);
             layerManager = new LayerManager();
@@ -234,7 +235,6 @@ let s = sketch => {
         // #region 'set-swap-time' 
         socket.on('set-swap-time', time => {
             overwrittenTime = time;
-            console.log(overwrittenTime);
             document.getElementById('time-left').innerHTML = `${overwrittenTime}:00`;
         });
         // #endregion

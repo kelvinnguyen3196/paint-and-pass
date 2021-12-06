@@ -12,7 +12,7 @@ class ToolManager {
             active: '#dd6b6f',
             inactive: '#dfe6e9'
         }
-        this.setTool(this.#_currentTool, width, height, layerManager, sketch, socketNum, socket);
+        this.setTool(this.#_currentTool, layerManager, width, height, sketch, socketNum, socket);
     }
     // this function will be used for onclick for each of the tool icons
     setTool(tool, layerManager, width, height, sketch, socketNum, socket) {
