@@ -185,6 +185,7 @@ let s = sketch => {
             // set friend color
             const friendStatusColor = otherPlayer['ready'] ? 'green' : 'red';
             toggleReadyDotAndStatus('ready-dotFriend', friendStatusColor, otherPlayer['name']);
+            socket.emit('set-swap-time', overwrittenTime);
         });
         // #endregion
         // #region 'friend-ready' we now know friend is ready
