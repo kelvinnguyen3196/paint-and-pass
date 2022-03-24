@@ -1,15 +1,9 @@
-<h1 align="center">
-    <br>
-    <img width="310" height="310" src="assets/readme-assets/icon.png">
-    <br>
-    <h1>Paint and Pass</h1>
-</h1>
-
 # Paint and Pass
 Paint and Pass is a painting app where you swap canvases every 5 minutes.
 
 ![Landing Page](public/assets/readme-assets/landing-page.png)
 
+They always say two brains are better than one. Paint and Pass was inspired by an activity where artists trade paintings every five minutes and continue where the other left off. Now it is brought to you in digital format ready to be played at the convenience of your computer.
 # Table of Contents
 - [Key Features](#key-features)
 - [Credits](#credits)
