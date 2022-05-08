@@ -9,7 +9,8 @@ They always say two brains are better than one. Paint and Pass was inspired by a
 
 # Table of Contents
 - [Key Features](#key-features)
-- [Process](#process)
+- [Process and How It Works](#process-and-how-it-works)
+- [What I Learned](#what-i-learned)
 - [Credits](#credits)
 - [First Successful Paint and Pass](#first-successful-paint-and-pass)
 
