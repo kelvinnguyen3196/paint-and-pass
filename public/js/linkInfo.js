@@ -1,7 +1,7 @@
-const url = 'www.paintandpass.com';
-const port = 80;
+const url = 'https://paint-and-pass.onrender.com/';
+const port = 443;
 
 export default {
-    url,
-    port
-}
+	url,
+	port,
+};
